@@ -1,18 +1,18 @@
-import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
+import React from 'react';
 
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { AppHeaderLeft } from '@/src/components/AppHeaderLeft';
+import { AppHeaderRight } from '@/src/components/AppHeaderRight';
+import { DadarTabButton } from '@/src/components/DadarTabButton';
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -21,39 +21,73 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: useClientOnlyValue(false, true),
+        tabBarActiveTintColor: '#FFD700', // Yellow tint
+        tabBarInactiveTintColor: '#000',
+        headerShown: true,
+        tabBarStyle: {
+          height: 70,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarLabelStyle: {
+          fontSize: 10,
+          fontWeight: '600',
+        }
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Home',
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          headerTitle: 'Welcome To Dadar',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 20
+          },
+          headerRight: () => <AppHeaderRight />,
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="places"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Places',
+          tabBarIcon: ({ color }) => <TabBarIcon name="building" color={color} />,
         }}
       />
+
+      {/* Center Custom Button */}
+      <Tabs.Screen
+        name="dadar"
+        options={{
+          headerTitle: 'Dadar',
+          headerTitleStyle: {
+              fontSize: 18,
+              fontWeight: 'bold',
+          },
+          headerShadowVisible: false,
+          headerLeft: () => <AppHeaderLeft />,
+          headerRight: () => <AppHeaderRight />,
+          title: '',
+          tabBarIcon: () => null, // Hide default icon
+          tabBarButton: (props) => <DadarTabButton {...props} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="shopping"
+        options={{
+          title: 'Shopping',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="event"
+        options={{
+          title: 'Event',
+          tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+        }}
+      />
+
     </Tabs>
   );
 }

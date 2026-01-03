@@ -1,0 +1,156 @@
+import ExperienceCard from '@/src/components/ExperienceCard';
+import { db } from '@/src/config/firebase'; // Ensure alias or relative path works
+import FontAwesome from '@expo/vector-icons/FontAwesome'; // Use FontAwesome
+import { useRouter } from 'expo-router';
+import { collection, getDocs, query } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+interface NewsItem {
+    id: string;
+    title: string;
+    description: string;
+    image: { uri: string };
+    type: 'news' | 'blog';
+    author?: string; // Added optional author
+}
+
+export default function Dadar() {
+    const [news, setNews] = useState<NewsItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const q = query(collection(db, 'experience'));
+                const querySnapshot = await getDocs(q);
+
+                const fetchedData: NewsItem[] = [];
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                     // Normalize image data
+                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
+                    
+                    fetchedData.push({
+                        id: doc.id,
+                        title: data.title || 'Untitled',
+                        description: data.description || '',
+                        image: { uri: imageUrl },
+                        type: 'news', // Kept generic for card, but data is experience
+                        author: data.author || 'Anonymous',
+                    });
+                });
+
+                setNews(fetchedData);
+            } catch (error) {
+                console.error("Error fetching experiences:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+
+    const handlePress = (id: string, title: string) => {
+        // Experience details page could be different, but using news detail for now or just generic
+        router.push({
+             pathname: '/experience/[id]', 
+             params: { id, title }
+        });
+    };
+
+    return (
+        <View style={styles.container}>
+            {/* Header handled in _layout.tsx */}
+
+            <View style={styles.subHeader}>
+                <View style={styles.subHeaderLeft}>
+                    <TouchableOpacity onPress={() => router.push('/news-feed')} style={{flexDirection: 'row', alignItems: 'center'}}>
+                         <FontAwesome name="newspaper-o" size={14} color="black" style={{marginRight: 8}}/>
+                         <Text style={styles.subHeaderTitle}>Read News & Blogs</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={styles.writeButton} onPress={() => router.push('/write-experience')}>
+                    <Text style={styles.writeButtonText}>Write Your Experience</Text>
+                </TouchableOpacity>
+            </View>
+
+            {loading ? (
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color="#FFD700" />
+                </View>
+            ) : (
+                <FlatList
+                    data={news}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                         <ExperienceCard
+                            image={item.image}
+                            title={item.title}
+                            content={item.description}
+                            author={item.author}
+                            onPress={() => handlePress(item.id, item.title)}
+                        />
+                    )}
+                    numColumns={2}
+                    contentContainerStyle={styles.listContent}
+                    columnWrapperStyle={styles.row}
+                    showsVerticalScrollIndicator={false}
+                    ListEmptyComponent={<View style={styles.center}><ActivityIndicator /></View>}
+                />
+            )}
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    subHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingBottom: 15,
+        backgroundColor: '#fff',
+    },
+    subHeaderLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    subHeaderTitle: {
+        fontSize: 16,
+        fontWeight: 'normal',
+    },
+    writeButton: {
+        backgroundColor: '#FFD700',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    writeButtonText: {
+        fontSize: 12,
+        fontWeight: 'normal',
+        color: '#000',
+    },
+    listContent: {
+        padding: 16,
+        paddingTop: 0,
+    },
+    row: {
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+});
