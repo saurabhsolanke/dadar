@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.dadar"
+      "bundleIdentifier": "com.anonymous.dadar",
+      "appleTeamId": "UR82624726"
     },
     "android": {
       "adaptiveIcon": {

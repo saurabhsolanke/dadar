@@ -60,6 +60,11 @@ export default function ProfileScreen() {
                      <Text style={styles.userName}>Guest User</Text>
                      <Text style={{ textAlign: 'center', marginBottom: 20, color: 'gray' }}>Please login to view your profile.</Text>
                       {/* Add Login Button or Link here if you have a dedicated login page */}
+                      <Link href="/login" asChild>
+                        <TouchableOpacity style={styles.loginButton}>
+                            <Text style={styles.loginButtonText}>Login</Text>
+                        </TouchableOpacity>
+                      </Link>
                  </View>
              </ScrollView>
         );
@@ -258,5 +263,19 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#FF3B30',
         fontWeight: '500',
+    },
+    loginButton: {
+        backgroundColor: '#FFD700',
+        paddingVertical: 12,
+        paddingHorizontal: 40,
+        borderRadius: 25,
+        marginTop: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loginButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: 'black',
     },
 });
