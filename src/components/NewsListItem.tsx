@@ -9,7 +9,12 @@ interface NewsListItemProps {
     onPress?: () => void;
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function NewsListItem({ title, content, image, author, onPress }: NewsListItemProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // Helper to process image source
     let source = image;
     if (image && typeof image === 'object' && image.uri && typeof image.uri === 'string') {
@@ -19,14 +24,25 @@ export default function NewsListItem({ title, content, image, author, onPress }:
         }
     }
 
+    const dynamicStyles = {
+        container: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#fff',
+            borderBottomColor: isDark ? '#333' : '#f0f0f0',
+        },
+        title: { color: isDark ? '#fff' : '#000' },
+        content: { color: isDark ? '#ccc' : '#666' },
+        author: { color: isDark ? '#888' : '#999' },
+        imageBg: { backgroundColor: isDark ? '#333' : '#f0f0f0' },
+    };
+
     return (
-        <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={styles.container}>
+        <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={[styles.container, dynamicStyles.container]}>
             <View style={styles.textContainer}>
-                <Text style={styles.title} numberOfLines={3}>{title}</Text>
-                <Text style={styles.content} numberOfLines={2}>{content}</Text>
-                {author && <Text style={styles.author}>{author}</Text>}
+                <Text style={[styles.title, dynamicStyles.title]} numberOfLines={3}>{title}</Text>
+                <Text style={[styles.content, dynamicStyles.content]} numberOfLines={2}>{content}</Text>
+                {author && <Text style={[styles.author, dynamicStyles.author]}>{author}</Text>}
             </View>
-            <View style={styles.imageContainer}>
+            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
         </TouchableOpacity>
@@ -73,5 +89,8 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
+    },
+    contentContainer: { // Added to prevent TypeScript errors if referenced elsewhere, though not used in this specific component's previous code
+        padding: 12,
     },
 });

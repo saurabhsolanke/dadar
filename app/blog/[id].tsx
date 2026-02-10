@@ -5,10 +5,14 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { db } from '../../src/config/firebase';
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function BlogDetailScreen() {
     const { id } = useLocalSearchParams();
     const [item, setItem] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         logScreenView(`Blog_Detail_${id}`);
@@ -35,9 +39,20 @@ export default function BlogDetailScreen() {
         fetchDetail();
     }, [id]);
 
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#444' },
+        author: { color: isDark ? '#888' : '#888' },
+        relatedContainer: { borderTopColor: isDark ? '#333' : '#f0f0f0' },
+        relatedCard: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+        headerTint: isDark ? '#fff' : '#000',
+    };
+
     if (loading) {
         return (
-            <View style={styles.center}>
+            <View style={[styles.center, dynamicStyles.container]}>
                 <ActivityIndicator size="large" color="#FFD700" />
             </View>
         );
@@ -45,17 +60,21 @@ export default function BlogDetailScreen() {
 
     if (!item) {
         return (
-            <View style={styles.center}>
-                <Text>Blog post not found.</Text>
+            <View style={[styles.center, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>Blog post not found.</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Stack.Screen options={{ title: 'Blog Details' }} />
+        <ScrollView style={[styles.container, dynamicStyles.container]}>
+            <Stack.Screen options={{ 
+                title: 'Blog Details',
+                headerStyle: dynamicStyles.headerStyle,
+                headerTintColor: dynamicStyles.headerTint,
+            }} />
 
-            <Text style={styles.headerTitle}>{item.title}</Text>
+            <Text style={[styles.headerTitle, dynamicStyles.text]}>{item.title}</Text>
 
             {(() => {
                 const imageUrl = Array.isArray(item.image) 
@@ -70,16 +89,16 @@ export default function BlogDetailScreen() {
 
             <View style={styles.contentContainer}>
                 {item.author && (
-                    <Text style={styles.author}>By {item.author}</Text>
+                    <Text style={[styles.author, dynamicStyles.author]}>By {item.author}</Text>
                 )}
-                <Text style={styles.content}>{item.description || item.content}</Text>
+                <Text style={[styles.content, dynamicStyles.subText]}>{item.description || item.content}</Text>
             </View>
 
-            <View style={styles.relatedContainer}>
-                <Text style={styles.relatedTitle}>Related Blogs</Text>
+            <View style={[styles.relatedContainer, dynamicStyles.relatedContainer]}>
+                <Text style={[styles.relatedTitle, dynamicStyles.text]}>Related Blogs</Text>
                 {/* Placeholders for related blogs */}
-                <View style={styles.relatedCard} />
-                <View style={styles.relatedCard} />
+                <View style={[styles.relatedCard, dynamicStyles.relatedCard]} />
+                <View style={[styles.relatedCard, dynamicStyles.relatedCard]} />
             </View>
         </ScrollView>
     );

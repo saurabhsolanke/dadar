@@ -140,7 +140,7 @@ export default function Dadar() {
                     contentContainerStyle={[styles.listContent, dynamicStyles.listContent]}
                     columnWrapperStyle={styles.row}
                     showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={<View style={styles.center}><ActivityIndicator /></View>}
+                    ListEmptyComponent={<View style={styles.center}><ActivityIndicator color={isDark ? "#FFD700" : "#999"} /></View>}
                 />
             )}
         </View>

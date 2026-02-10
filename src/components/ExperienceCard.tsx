@@ -16,7 +16,12 @@ const { width: screenWidth } = Dimensions.get('window');
 // Available width = screenWidth - 32 - 12
 const CARD_WIDTH = (screenWidth - 32 - 12) / 2;
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function ExperienceCard({ title, content, image, author, onPress }: ExperienceCardProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // Helper to process image source
     let source = image;
     if (image && typeof image === 'object' && image.uri && typeof image.uri === 'string') {
@@ -26,15 +31,26 @@ export default function ExperienceCard({ title, content, image, author, onPress 
         }
     }
 
+    const dynamicStyles = {
+        card: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#fff',
+            borderColor: isDark ? '#333' : '#f0f0f0',
+        },
+        headline: { color: isDark ? '#fff' : '#000' },
+        summary: { color: isDark ? '#ccc' : '#555' },
+        author: { color: isDark ? '#888' : '#888' },
+        imageBg: { backgroundColor: isDark ? '#333' : '#f8f8f8' },
+    };
+
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.card}>
-            <View style={styles.imageContainer}>
+        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, dynamicStyles.card]}>
+            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
             <View style={styles.contentContainer}>
-                 {author && <Text style={styles.author}>{author}</Text>}
-                <Text style={styles.headline} numberOfLines={2}>{title}</Text>
-                <Text style={styles.summary} numberOfLines={4}>{content}</Text>
+                 {author && <Text style={[styles.author, dynamicStyles.author]}>{author}</Text>}
+                <Text style={[styles.headline, dynamicStyles.headline]} numberOfLines={2}>{title}</Text>
+                <Text style={[styles.summary, dynamicStyles.summary]} numberOfLines={4}>{content}</Text>
             </View>
         </TouchableOpacity>
     );
