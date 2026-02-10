@@ -2,6 +2,7 @@ import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import NewsCard from '@/src/components/NewsCard';
 import NewsListItem from '@/src/components/NewsListItem';
 import { db } from '@/src/config/firebase';
+import { useTheme } from '@/src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Stack, useRouter } from 'expo-router';
@@ -78,33 +79,50 @@ export default function NewsFeed() {
     // Data is already filtered by the fetch effect
     const filteredData = news;
 
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        tabContainer: { backgroundColor: isDark ? '#000' : '#fff', borderBottomColor: isDark ? '#333' : '#eee' },
+        tabText: { color: isDark ? '#888' : '#888' },
+        activeTabText: { color: isDark ? '#fff' : 'black' },
+        activeTabIcon: { color: isDark ? '#fff' : 'black' },
+        inactiveTabIcon: { color: isDark ? '#888' : '#888' },
+        listContent: { backgroundColor: isDark ? '#000' : '#fff' },
+        emptyText: { color: isDark ? '#888' : '#888' },
+        headerIcon: { color: isDark ? '#fff' : 'black' },
+    };
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{
                 headerShown: true,
                 headerTitle: "News & Blog",
+                headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                headerTintColor: isDark ? '#fff' : '#000',
                 headerLeft: () => (
                     <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 0 }}>
-                        <Ionicons name="arrow-back" size={24} color="black" />
+                        <Ionicons name="arrow-back" size={24} color={dynamicStyles.headerIcon.color} />
                     </TouchableOpacity>
                 ),
                 headerRight: () => <AppHeaderRight />
             }} />
 
             {/* Tabs */}
-            <View style={styles.tabContainer}>
+            <View style={[styles.tabContainer, dynamicStyles.tabContainer]}>
                 <TouchableOpacity
                     style={[styles.tab, activeTab === 'news' && styles.activeTab]}
                     onPress={() => setActiveTab('news')}
                 >
-                    <FontAwesome name="newspaper-o" size={18} color={activeTab === 'news' ? 'black' : '#888'} />
+                    <FontAwesome name="newspaper-o" size={18} color={activeTab === 'news' ? dynamicStyles.activeTabIcon.color : dynamicStyles.inactiveTabIcon.color} />
                     <Text style={[styles.tabText, activeTab === 'news' && styles.activeTabText]}>News</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[styles.tab, activeTab === 'blog' && styles.activeTab]}
                     onPress={() => setActiveTab('blog')}
                 >
-                    <Ionicons name="documents-outline" size={20} color={activeTab === 'blog' ? 'black' : '#888'} />
+                    <Ionicons name="documents-outline" size={20} color={activeTab === 'blog' ? dynamicStyles.activeTabIcon.color : dynamicStyles.inactiveTabIcon.color} />
                     <Text style={[styles.tabText, activeTab === 'blog' && styles.activeTabText]}>Blogs</Text>
                 </TouchableOpacity>
             </View>
@@ -143,11 +161,11 @@ export default function NewsFeed() {
                         }
                     }}
                     numColumns={activeTab === 'blog' ? 2 : 1}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={[styles.listContent, dynamicStyles.listContent]}
                     columnWrapperStyle={activeTab === 'blog' ? styles.row : undefined}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.center}><Text style={{ color: '#888', marginTop: 20 }}>No {activeTab === 'news' ? 'News' : 'Blogs'} Found</Text></View>
+                        <View style={styles.center}><Text style={{ color: dynamicStyles.emptyText.color, marginTop: 20 }}>No {activeTab === 'news' ? 'News' : 'Blogs'} Found</Text></View>
                     }
                 />
             )}

@@ -10,7 +10,12 @@ interface NewsCardProps {
     width?: number;
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function NewsCard({ title, content, image, author, onPress, width = 200 }: NewsCardProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // Helper to process image source
     let source = image;
     if (image && typeof image === 'object' && image.uri && typeof image.uri === 'string') {
@@ -19,15 +24,24 @@ export default function NewsCard({ title, content, image, author, onPress, width
             source = { ...image, uri: url.replace('.heic', '.jpg') };
         }
     }
+
+    const dynamicStyles = {
+        card: { backgroundColor: isDark ? '#1c1c1e' : '#fff' },
+        headline: { color: isDark ? '#fff' : '#000' },
+        summary: { color: isDark ? '#ccc' : '#666' },
+        author: { color: isDark ? '#888' : '#888' },
+        imageBg: { backgroundColor: isDark ? '#333' : '#f0f0f0' },
+    };
+
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }]}>
-            <View style={styles.imageContainer}>
+        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }, dynamicStyles.card]}>
+            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
             <View style={styles.contentContainer}>
-                 {author && <Text style={styles.author}>{author}</Text>}
-                <Text style={styles.headline} numberOfLines={2}>{title}</Text>
-                <Text style={styles.summary} numberOfLines={3}>{content}</Text>
+                 {author && <Text style={[styles.author, dynamicStyles.author]}>{author}</Text>}
+                <Text style={[styles.headline, dynamicStyles.headline]} numberOfLines={2}>{title}</Text>
+                <Text style={[styles.summary, dynamicStyles.summary]} numberOfLines={3}>{content}</Text>
             </View>
         </TouchableOpacity>
     );

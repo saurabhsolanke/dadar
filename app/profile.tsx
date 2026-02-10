@@ -1,6 +1,7 @@
+import { useTheme } from '@/src/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, Stack, useRouter } from 'expo-router';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../src/hooks/useAuth';
 import { logout } from '../src/services/auth';
@@ -8,6 +9,8 @@ import { logout } from '../src/services/auth';
 export default function ProfileScreen() {
     const router = useRouter();
     const { user, loading } = useAuth();
+    const { theme, toggleTheme } = useTheme();
+    const isDark = theme === 'dark';
 
     const menuItems = [
         { icon: 'person-outline', label: 'My Profile', route: '/edit-profile' },
@@ -34,9 +37,19 @@ export default function ProfileScreen() {
         }
     };
 
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#f8f8f8' },
+        text: { color: isDark ? '#fff' : 'black' },
+        card: { backgroundColor: isDark ? '#1c1c1e' : 'white' },
+        menuItemLabel: { color: isDark ? '#fff' : 'black' },
+        menuIconColor: isDark ? '#fff' : 'black',
+        logoutContainer: { backgroundColor: isDark ? '#1c1c1e' : 'white' },
+        backButtonColor: isDark ? '#fff' : 'black', // Though header is gold, black usually looks better. Let's keep black for header items as background is gold.
+    };
+
     if (loading) {
         return (
-             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+             <View style={[styles.container, dynamicStyles.container, { justifyContent: 'center', alignItems: 'center' }]}>
                 <ActivityIndicator size="large" color="#FFD700" />
             </View>
         );
@@ -44,7 +57,7 @@ export default function ProfileScreen() {
 
     if (!user) {
          return (
-             <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+             <ScrollView style={[styles.container, dynamicStyles.container]} contentContainerStyle={styles.content}>
                 <Stack.Screen options={{ headerShown: false }} />
                 <View style={styles.headerBackground}>
                     <View style={styles.headerContent}>
@@ -56,9 +69,9 @@ export default function ProfileScreen() {
                     </View>
                 </View>
 
-                 <View style={styles.card}>
-                     <Text style={styles.userName}>Guest User</Text>
-                     <Text style={{ textAlign: 'center', marginBottom: 20, color: 'gray' }}>Please login to view your profile.</Text>
+                 <View style={[styles.card, dynamicStyles.card]}>
+                     <Text style={[styles.userName, dynamicStyles.text]}>Guest User</Text>
+                     <Text style={{ textAlign: 'center', marginBottom: 20, color: isDark ? '#ccc' : 'gray' }}>Please login to view your profile.</Text>
                       {/* Add Login Button or Link here if you have a dedicated login page */}
                       <Link href="/login" asChild>
                         <TouchableOpacity style={styles.loginButton}>
@@ -66,12 +79,29 @@ export default function ProfileScreen() {
                         </TouchableOpacity>
                       </Link>
                  </View>
+                 
+                 {/* Theme Toggle for Guest */}
+                 <View style={[styles.card, dynamicStyles.card, { marginTop: 20 }]}>
+                    <View style={styles.menuItem}>
+                         <View style={styles.menuItemLeft}>
+                             <Ionicons name={isDark ? "moon" : "sunny"} size={24} color={dynamicStyles.menuIconColor} />
+                             <Text style={[styles.menuItemLabel, dynamicStyles.menuItemLabel]}>Dark Mode</Text>
+                         </View>
+                         <Switch
+                             trackColor={{ false: "#767577", true: "#FFD700" }}
+                             thumbColor={isDark ? "#f4f3f4" : "#f4f3f4"}
+                             ios_backgroundColor="#3e3e3e"
+                             onValueChange={toggleTheme}
+                             value={isDark}
+                         />
+                     </View>
+                 </View>
              </ScrollView>
         );
     }
 
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <ScrollView style={[styles.container, dynamicStyles.container]} contentContainerStyle={styles.content}>
             <Stack.Screen options={{ headerShown: false }} />
             
             {/* Header Background */}
@@ -86,10 +116,10 @@ export default function ProfileScreen() {
             </View>
 
             {/* Main Card */}
-            <View style={styles.card}>
+            <View style={[styles.card, dynamicStyles.card]}>
                 {/* Avatar Section */}
                 <View style={styles.avatarContainer}>
-                    <View style={styles.avatarWrapper}>
+                    <View style={[styles.avatarWrapper, { backgroundColor: dynamicStyles.card.backgroundColor }]}>
                         <Image 
                             source={{ uri: user.photoURL || '' }} 
                             style={styles.avatar} 
@@ -103,15 +133,15 @@ export default function ProfileScreen() {
                 </View>
 
                 {/* Display Name or Fallback */}
-                <Text style={styles.userName}>{user.displayName || user.phoneNumber || user.email || 'User'}</Text>
+                <Text style={[styles.userName, dynamicStyles.text]}>{user.displayName || user.phoneNumber || user.email || 'User'}</Text>
                  {/* Display Email/Phone if available and different from display name logic above, 
                  or just keep it simple. Often good to show at least one identifier beneath name if name is set. */}
-                 {(user.email && user.displayName) && <Text style={styles.userSubText}>{user.email}</Text>}
-                 {(user.phoneNumber && user.displayName) && <Text style={styles.userSubText}>{user.phoneNumber}</Text>}
+                 {(user.email && user.displayName) && <Text style={[styles.userSubText, { color: isDark ? '#ccc' : 'gray' }]}>{user.email}</Text>}
+                 {(user.phoneNumber && user.displayName) && <Text style={[styles.userSubText, { color: isDark ? '#ccc' : 'gray' }]}>{user.phoneNumber}</Text>}
 
 
                 {/* Divider */}
-                <View style={styles.divider} />
+                <View style={[styles.divider, { backgroundColor: isDark ? '#333' : '#eee' }]} />
 
                 {/* Menu Items */}
                 <View style={styles.menuContainer}>
@@ -119,17 +149,32 @@ export default function ProfileScreen() {
                         <Link key={index} href={item.route as any} asChild>
                             <TouchableOpacity style={styles.menuItem}>
                                 <View style={styles.menuItemLeft}>
-                                    <Ionicons name={item.icon as any} size={24} color="black" />
-                                    <Text style={styles.menuItemLabel}>{item.label}</Text>
+                                    <Ionicons name={item.icon as any} size={24} color={dynamicStyles.menuIconColor} />
+                                    <Text style={[styles.menuItemLabel, dynamicStyles.menuItemLabel]}>{item.label}</Text>
                                 </View>
                             </TouchableOpacity>
                         </Link>
                     ))}
+                    
+                    {/* Theme Toggle */}
+                     <View style={styles.menuItem}>
+                         <View style={styles.menuItemLeft}>
+                             <Ionicons name={isDark ? "moon-outline" : "sunny-outline"} size={24} color={dynamicStyles.menuIconColor} />
+                             <Text style={[styles.menuItemLabel, dynamicStyles.menuItemLabel]}>Dark Mode</Text>
+                         </View>
+                         <Switch
+                             trackColor={{ false: "#767577", true: "#FFD700" }}
+                             thumbColor={isDark ? "#f4f3f4" : "#f4f3f4"}
+                             ios_backgroundColor="#3e3e3e"
+                             onValueChange={toggleTheme}
+                             value={isDark}
+                         />
+                     </View>
                 </View>
             </View>
 
              {/* Logout Button */}
-            <View style={styles.logoutContainer}>
+            <View style={[styles.logoutContainer, dynamicStyles.logoutContainer]}>
                 <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
                     <Text style={styles.logoutText}>Log out</Text>

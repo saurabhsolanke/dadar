@@ -1,6 +1,7 @@
 import ExperienceCard from '@/src/components/ExperienceCard';
 import SkeletonLoader from '@/src/components/SkeletonLoader';
 import { db } from '@/src/config/firebase'; // Ensure alias or relative path works
+import { useTheme } from '@/src/context/ThemeContext';
 import FontAwesome from '@expo/vector-icons/FontAwesome'; // Use FontAwesome
 import { useRouter } from 'expo-router';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
@@ -59,6 +60,19 @@ export default function Dadar() {
     }, []);
 
 
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : 'black' },
+        tabContainer: { backgroundColor: isDark ? '#000' : '#fff', borderBottomColor: isDark ? '#333' : '#eee' },
+        tabText: { color: isDark ? '#888' : '#888' }, // Inactive tab text color
+        activeTabText: { color: isDark ? '#fff' : 'black' },
+        iconColor: isDark ? '#fff' : 'black',
+        listContent: { backgroundColor: isDark ? '#000' : '#fff' }, // Ensure list background matches
+    };
+
     const handlePress = (id: string, title: string) => {
         // Experience details page could be different, but using news detail for now or just generic
         router.push({
@@ -68,19 +82,19 @@ export default function Dadar() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             {/* Header handled in _layout.tsx */}
-            <View style={styles.tabContainer}>
+            <View style={[styles.tabContainer, dynamicStyles.tabContainer]}>
                 <TouchableOpacity style={styles.tab} onPress={() => router.push('/news-feed')}>
-                      <FontAwesome name="newspaper-o" size={14} color="black" style={{ marginRight: 2 }} />
-                    <Text style={styles.tabText}>News</Text>
+                      <FontAwesome name="newspaper-o" size={14} color={dynamicStyles.iconColor} style={{ marginRight: 2 }} />
+                    <Text style={[styles.tabText, dynamicStyles.tabText]}>News</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{paddingVertical: 12,  gap: 8,}} onPress={() => router.push('/write-experience')}>
-                    <Text style={styles.tabText }> <FontAwesome name="pencil" size={14} color="black" style={{ marginRight: 2 }} /> Write Experience</Text>
+                    <Text style={[styles.tabText, dynamicStyles.tabText]}> <FontAwesome name="pencil" size={14} color={dynamicStyles.iconColor} style={{ marginRight: 2 }} /> Write Experience</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.tab} onPress={() => router.push('/map')}>
-                    <FontAwesome name="map-marker" size={14} color="black" style={{ marginRight: 2 }} />
-                    <Text style={styles.tabText}>Map</Text> 
+                    <FontAwesome name="map-marker" size={14} color={dynamicStyles.iconColor} style={{ marginRight: 2 }} />
+                    <Text style={[styles.tabText, dynamicStyles.tabText]}>Map</Text> 
                 </TouchableOpacity>
             </View>
 
@@ -98,7 +112,7 @@ export default function Dadar() {
             </View> */}
 
             {loading ? (
-                <View style={styles.listContent}>
+                <View style={[styles.listContent, dynamicStyles.listContent]}>
                   <View style={styles.row}>
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                       <View key={i} style={{ width: '48%', marginBottom: 15 }}>
@@ -123,7 +137,7 @@ export default function Dadar() {
                         />
                     )}
                     numColumns={2}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={[styles.listContent, dynamicStyles.listContent]}
                     columnWrapperStyle={styles.row}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={<View style={styles.center}><ActivityIndicator /></View>}

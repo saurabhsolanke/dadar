@@ -17,11 +17,28 @@ interface ShopDetails {
     images: string[];
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function ShopDetailScreen() {
     const { id, title: paramTitle } = useLocalSearchParams();
     const router = useRouter();
     const [shop, setShop] = useState<ShopDetails | null>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#666' },
+        cardBackground: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        specialtyItem: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#fff',
+            borderColor: isDark ? '#333' : '#eee',
+        },
+        iconColor: isDark ? '#ccc' : '#666',
+        bottomBar: { backgroundColor: isDark ? '#000' : '#fff' },
+    };
 
     useEffect(() => {
         const fetchShop = async () => {
@@ -66,16 +83,16 @@ export default function ShopDetailScreen() {
 
     if (loading) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <ActivityIndicator size="large" color="#000" />
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     if (!shop) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <Text>Shop not found.</Text>
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>Shop not found.</Text>
                 <TouchableOpacity style={styles.backButtonSimple} onPress={() => router.back()}>
                     <Text style={{ color: 'blue' }}>Go Back</Text>
                 </TouchableOpacity>
@@ -84,7 +101,7 @@ export default function ShopDetailScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -112,49 +129,49 @@ export default function ShopDetailScreen() {
                 </View>
 
                 {/* Info Cards */}
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, dynamicStyles.cardBackground]}>
                     <View style={styles.infoCard}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="map-marker" size={16} color="#666" />
+                            <FontAwesome name="map-marker" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>Location</Text>
-                            <Text style={styles.infoValue}>{shop.location}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>Location</Text>
+                            <Text style={[styles.infoValue, dynamicStyles.subText]}>{shop.location}</Text>
                         </View>
                     </View>
                     <View style={[styles.infoCard, { marginLeft: 10 }]}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="clock-o" size={16} color="#666" />
+                            <FontAwesome name="clock-o" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>{shop.time}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>{shop.time}</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* Specialty / Shop Features - Customized for Shops */}
-                <Text style={styles.sectionHeader}>Features</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Features</Text>
                 <View style={styles.specialtyRow}>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="credit-card" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Cards</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="credit-card" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Cards</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="shopping-bag" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Takeaway</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="shopping-bag" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Takeaway</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="check-circle" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Verified</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="check-circle" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Verified</Text>
                     </View>
                 </View>
 
                 {/* Description */}
-                <Text style={styles.sectionHeader}>About</Text>
-                <Text style={styles.descriptionText}>{shop.description}</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>About</Text>
+                <Text style={[styles.descriptionText, dynamicStyles.subText]}>{shop.description}</Text>
 
                 {/* Images */}
-                <Text style={styles.sectionHeader}>Gallery</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Gallery</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
                     {shop.images.map((img, index) => (
                         <Image key={index} source={{ uri: img }} style={styles.galleryImage} />
@@ -165,7 +182,7 @@ export default function ShopDetailScreen() {
             </ScrollView>
 
             {/* Bottom Action Bar */}
-            <View style={styles.bottomBar}>
+            <View style={[styles.bottomBar, dynamicStyles.bottomBar]}>
                 <TouchableOpacity style={styles.bookButton}>
                     <Text style={styles.bookButtonText}>Directions</Text>
                 </TouchableOpacity>

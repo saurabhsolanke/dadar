@@ -53,8 +53,12 @@ interface EventItem {
   image: { uri: string };
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function HomeScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const [hotels, setHotels] = useState<HotelItem[]>([]);
   const [shops, setShops] = useState<ShopItem[]>([]);
@@ -64,6 +68,20 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
   const viewportWidth = Dimensions.get('window').width;
+
+  const dynamicStyles = {
+    container: { backgroundColor: isDark ? '#000' : '#f8f9fa' },
+    text: { color: isDark ? '#fff' : '#000' },
+    subText: { color: isDark ? '#ccc' : '#666' },
+    searchInput: { 
+        backgroundColor: isDark ? '#1c1c1e' : '#fff',
+        color: isDark ? '#fff' : '#000',
+        borderColor: isDark ? '#333' : '#000',
+    },
+    searchIcon: { color: isDark ? '#ccc' : '#000' },
+    sectionTitle: { color: isDark ? '#fff' : '#000' },
+    paginationDotInactive: { backgroundColor: isDark ? '#444' : '#ccc' },
+  };
 
   const handleEventScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
@@ -201,7 +219,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
+    <ScrollView style={[styles.container, dynamicStyles.container]} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
       {/* Search Bar */}
       <TouchableOpacity
         style={styles.searchContainer}
@@ -209,13 +227,13 @@ export default function HomeScreen() {
         onPress={() => router.push('/search')}
       >
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, dynamicStyles.searchInput]}
           placeholder="Search Hotel,Places,Events"
-          placeholderTextColor="#666"
+          placeholderTextColor={isDark ? "#888" : "#666"}
           editable={false} // Disable typing on home screen
           pointerEvents="none" // Pass touches to parent TouchableOpacity
         />
-        <FontAwesome name="search" size={20} color="#000" style={styles.searchIcon} />
+        <FontAwesome name="search" size={20} color={dynamicStyles.searchIcon.color} style={styles.searchIcon} />
       </TouchableOpacity>
 
       {/* Banner Carousel */}
@@ -223,7 +241,7 @@ export default function HomeScreen() {
 
       {/* Hotels Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Hotel's in Dadar</Text>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Hotel's in Dadar</Text>
         <TouchableOpacity onPress={() => router.push('/hotels')}>
             <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
@@ -252,7 +270,7 @@ export default function HomeScreen() {
 
       {/* Shops Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Best Shop In Dadar</Text>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Best Shop In Dadar</Text>
         <TouchableOpacity onPress={() => router.push('/places')}>
             <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
@@ -280,7 +298,7 @@ export default function HomeScreen() {
       </ScrollView>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Organise Your Event</Text>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Organise Your Event</Text>
         <TouchableOpacity onPress={() => router.push('/event')}>
             <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
@@ -318,7 +336,7 @@ export default function HomeScreen() {
                     key={index}
                     style={[
                         styles.paginationDot,
-                        activeEventIndex === index ? styles.paginationDotActive : styles.paginationDotInactive
+                        activeEventIndex === index ? styles.paginationDotActive : dynamicStyles.paginationDotInactive
                     ]}
                     />
                 ))}
@@ -329,7 +347,7 @@ export default function HomeScreen() {
 
       {/* Historical Places Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>historical Places</Text>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>historical Places</Text>
         <TouchableOpacity onPress={() => router.push('/places')}>
           <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
@@ -360,7 +378,7 @@ export default function HomeScreen() {
 
       {/* News & Blog Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>News & Blog</Text>
+        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>News & Blog</Text>
          <TouchableOpacity onPress={() => router.push('/news-feed')}>
             <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>

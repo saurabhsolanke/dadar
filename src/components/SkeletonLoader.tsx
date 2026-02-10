@@ -1,3 +1,4 @@
+import { useTheme } from '@/src/context/ThemeContext';
 import React, { useEffect } from 'react';
 import { DimensionValue, StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
@@ -22,6 +23,8 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
     style,
 }) => {
     const opacity = useSharedValue(0.3);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         opacity.value = withRepeat(
@@ -44,7 +47,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
         <Animated.View
             style={[
                 styles.skeleton,
-                { width, height, borderRadius },
+                { width, height, borderRadius, backgroundColor: isDark ? '#333' : '#E0E0E0' },
                 animatedStyle,
                 style,
             ]}

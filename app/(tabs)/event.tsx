@@ -21,10 +21,26 @@ interface EventItem {
     image: { uri: string };
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function EventScreen() {
     const router = useRouter();
     const [events, setEvents] = useState<EventItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : 'black' },
+        searchContainer: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#F5F5F5',
+            borderColor: isDark ? '#333' : '#000',
+        },
+        searchIcon: { color: isDark ? '#888' : '#000' },
+        placeholderText: { color: isDark ? '#888' : '#666' },
+        headerIcon: { color: isDark ? '#fff' : 'black' },
+    };
 
     const navigateTocontactus = () => {
         router.push({
@@ -75,19 +91,22 @@ export default function EventScreen() {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen
                 options={{
                     headerTitle: 'Historical Event',
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
-                            <FontAwesome name="arrow-left" size={20} color="black" />
+                            <FontAwesome name="arrow-left" size={20} color={dynamicStyles.headerIcon.color} />
                         </TouchableOpacity>
                     ),
                     headerRight: () => <AppHeaderRight />,
                     headerTitleStyle: {
                         fontSize: 18,
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        color: isDark ? '#fff' : '#000',
                     }
                 }}
             />
@@ -95,22 +114,22 @@ export default function EventScreen() {
             {/* <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}> */}
             {/* Search Bar */}
             <TouchableOpacity
-                style={styles.searchContainer}
+                style={[styles.searchContainer, dynamicStyles.searchContainer]}
                 activeOpacity={1}
                 onPress={() => router.push('/search')}
             >
                 <TextInput
-                    style={styles.content}
+                    style={styles.contentInput}
                     placeholder="Search Hotel,Places,Events"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
                     editable={false}
                     pointerEvents="none"
                 />
-                <FontAwesome name="search" size={20} color="#000" />
+                <FontAwesome name="search" size={20} color={dynamicStyles.searchIcon.color} />
             </TouchableOpacity>
 
             <View style={styles.headerRow}>
-                <Text style={styles.sectionTitle}>Events</Text>
+                <Text style={[styles.sectionTitle, dynamicStyles.text]}>Events</Text>
                 <TouchableOpacity style={styles.organiseButton} onPress={navigateTocontactus}>
                     <Text style={styles.organiseText}>Organise Your Event</Text>
                 </TouchableOpacity>
@@ -183,9 +202,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginTop: 10,
     },
-    contentInput: { // Renamed from 'content' to avoid conflict or clarify
+    contentInput: { 
         flex: 1,
-        paddingHorizontal: 15, // Adjusted to match event/places (styles.content)
+        paddingHorizontal: 15, 
     },
     content: {
         flex: 1,

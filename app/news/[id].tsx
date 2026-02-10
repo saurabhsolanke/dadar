@@ -5,10 +5,22 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { db } from '../../src/config/firebase';
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function NewsDetailScreen() {
     const { id } = useLocalSearchParams();
     const [newsItem, setNewsItem] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#444' },
+        cardBackground: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        borderColor: { borderColor: isDark ? '#333' : '#f0f0f0' },
+    };
 
     useEffect(() => {
         logScreenView(`News_Detail_${id}`);
@@ -37,25 +49,25 @@ export default function NewsDetailScreen() {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#FFD700" />
+            <View style={[styles.center, dynamicStyles.container]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     if (!newsItem) {
         return (
-            <View style={styles.center}>
-                <Text>News item not found.</Text>
+            <View style={[styles.center, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>News item not found.</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Stack.Screen options={{ title: 'News Detail' }} />
+        <ScrollView style={[styles.container, dynamicStyles.container]}>
+            <Stack.Screen options={{ title: 'News Detail', headerStyle: { backgroundColor: isDark ? '#000' : '#fff' }, headerTintColor: isDark ? '#fff' : '#000' }} />
 
-            <Text style={styles.headerTitle}>{newsItem.title}</Text>
+            <Text style={[styles.headerTitle, dynamicStyles.text]}>{newsItem.title}</Text>
 
             {(() => {
                 const imageUrl = Array.isArray(newsItem.image) 
@@ -69,14 +81,14 @@ export default function NewsDetailScreen() {
             })()}
 
             <View style={styles.contentContainer}>
-                <Text style={styles.content}>{newsItem.description || newsItem.content}</Text>
+                <Text style={[styles.content, dynamicStyles.subText]}>{newsItem.description || newsItem.content}</Text>
             </View>
 
-            <View style={styles.relatedContainer}>
-                <Text style={styles.relatedTitle}>Related News</Text>
+            <View style={[styles.relatedContainer, dynamicStyles.borderColor]}>
+                <Text style={[styles.relatedTitle, dynamicStyles.text]}>Related News</Text>
                 {/* Placeholders for related news - can be implemented later */}
-                <View style={styles.relatedCard} />
-                <View style={styles.relatedCard} />
+                <View style={[styles.relatedCard, dynamicStyles.cardBackground]} />
+                <View style={[styles.relatedCard, dynamicStyles.cardBackground]} />
             </View>
         </ScrollView>
     );

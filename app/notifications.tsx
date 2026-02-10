@@ -1,3 +1,4 @@
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
@@ -33,30 +34,58 @@ const NOTIFICATIONS = [
     },
 ];
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function NotificationsScreen() {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        item: { backgroundColor: isDark ? '#1c1c1e' : '#f8f9fa' },
+        unreadItem: { 
+            backgroundColor: isDark ? '#2c2c2e' : '#fff',
+            borderColor: isDark ? '#444' : '#eee', 
+        },
+        title: { color: isDark ? '#fff' : '#000' },
+        message: { color: isDark ? '#ccc' : '#555' },
+        time: { color: isDark ? '#888' : '#888' },
+        iconContainer: { backgroundColor: isDark ? '#333' : '#FFF9C4' },
+    };
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
+            <Stack.Screen
+                options={{
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
+                }}
+            />
             <FlatList
                 data={NOTIFICATIONS}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <View style={[styles.notificationItem, !item.read && styles.unreadItem]}>
-                        <View style={styles.iconContainer}>
+                    <View style={[
+                        styles.notificationItem, 
+                        dynamicStyles.item, 
+                        !item.read && [styles.unreadItem, dynamicStyles.unreadItem]
+                    ]}>
+                        <View style={[styles.iconContainer, dynamicStyles.iconContainer]}>
                             <Text style={styles.iconText}>🔔</Text>
                         </View>
                         <View style={styles.contentContainer}>
                             <View style={styles.headerRow}>
-                                <Text style={styles.title}>{item.title}</Text>
-                                <Text style={styles.time}>{item.time}</Text>
+                                <Text style={[styles.title, dynamicStyles.title]}>{item.title}</Text>
+                                <Text style={[styles.time, dynamicStyles.time]}>{item.time}</Text>
                             </View>
-                            <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
+                            <Text style={[styles.message, dynamicStyles.message]} numberOfLines={2}>{item.message}</Text>
                         </View>
                         {!item.read && <View style={styles.dot} />}
                     </View>
                 )}
                 contentContainerStyle={styles.listContent}
             />
-            <StatusBar style="auto" />
+            <StatusBar style={isDark ? "light" : "dark"} />
         </View>
     );
 }

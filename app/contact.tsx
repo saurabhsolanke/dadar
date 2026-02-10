@@ -2,10 +2,28 @@ import ContactForm from '@/src/components/ContactForm';
 import { Stack } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function ContactScreen() {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#f8f8f8' },
+        header: { backgroundColor: isDark ? '#000' : '#fff' },
+        headerText: { color: isDark ? '#fff' : '#000' },
+    };
+
     return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Stack.Screen options={{ title: 'Contact Us', headerBackTitle: 'Back' }} />
+        <ScrollView style={[styles.container, dynamicStyles.container]} contentContainerStyle={styles.content}>
+            <Stack.Screen 
+                options={{ 
+                    title: 'Contact Us', 
+                    headerBackTitle: 'Back',
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
+                }} 
+            />
             <View style={styles.yellowBackground} />
             <View style={{ alignItems: 'flex-end', padding: 10, zIndex: 1 }}>
                 {/* <Link href="/login" asChild>

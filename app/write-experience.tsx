@@ -9,14 +9,32 @@ import Toast from 'react-native-toast-message';
 import { db } from '../src/config/firebase';
 import { useAuth } from '../src/hooks/useAuth';
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function WriteExperienceScreen() {
     const router = useRouter();
     const { user } = useAuth();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [image, setImage] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        header: { backgroundColor: isDark ? '#000' : '#fff', borderBottomColor: isDark ? '#333' : '#eee' },
+        text: { color: isDark ? '#fff' : 'black' },
+        input: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#f8f8f8', 
+            borderColor: isDark ? '#333' : '#ddd',
+            color: isDark ? '#fff' : 'black'
+        },
+        placeholderText: { color: isDark ? '#888' : '#666' },
+        imagePlaceholder: { backgroundColor: isDark ? '#1c1c1e' : '#f8f8f8' },
+        iconColor: isDark ? '#fff' : 'black',
+    };
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -87,35 +105,37 @@ export default function WriteExperienceScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{ headerShown: false }} />
             
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, dynamicStyles.header]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="black" />
+                    <Ionicons name="arrow-back" size={24} color={dynamicStyles.iconColor} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Write Experience</Text>
+                <Text style={[styles.headerTitle, dynamicStyles.text]}>Write Experience</Text>
                 <View style={{ width: 40 }} />
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
                 
                 {/* Title Input */}
-                <Text style={styles.label}>Title</Text>
+                <Text style={[styles.label, dynamicStyles.text]}>Title</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, dynamicStyles.input]}
                     placeholder="Give a title to your experience..."
+                    placeholderTextColor={isDark ? '#888' : '#999'}
                     value={title}
                     onChangeText={setTitle}
                     maxLength={100}
                 />
 
                 {/* Content Input */}
-                <Text style={styles.label}>Your Story</Text>
+                <Text style={[styles.label, dynamicStyles.text]}>Your Story</Text>
                 <TextInput
-                    style={[styles.input, styles.textArea]}
+                    style={[styles.input, styles.textArea, dynamicStyles.input]}
                     placeholder="Share your thoughts..."
+                    placeholderTextColor={isDark ? '#888' : '#999'}
                     value={content}
                     onChangeText={setContent}
                     multiline
@@ -123,14 +143,14 @@ export default function WriteExperienceScreen() {
                 />
 
                 {/* Image Picker */}
-                <Text style={styles.label}>Add Photo</Text>
-                <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+                <Text style={[styles.label, dynamicStyles.text]}>Add Photo</Text>
+                <TouchableOpacity onPress={pickImage} style={[styles.imagePicker, { borderColor: dynamicStyles.input.borderColor }]}>
                     {image ? (
                         <Image source={{ uri: image }} style={styles.previewImage} />
                     ) : (
-                        <View style={styles.imagePlaceholder}>
-                            <Ionicons name="camera-outline" size={40} color="#666" />
-                            <Text style={styles.imagePlaceholderText}>Tap to select image</Text>
+                        <View style={[styles.imagePlaceholder, dynamicStyles.imagePlaceholder]}>
+                            <Ionicons name="camera-outline" size={40} color={dynamicStyles.placeholderText.color} />
+                            <Text style={[styles.imagePlaceholderText, dynamicStyles.placeholderText]}>Tap to select image</Text>
                         </View>
                     )}
                 </TouchableOpacity>

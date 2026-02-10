@@ -18,11 +18,29 @@ interface PlaceDetails {
     images: string[];
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function PlaceDetailsScreen() {
     const { id, title: paramTitle } = useLocalSearchParams();
     const router = useRouter();
     const [place, setPlace] = useState<PlaceDetails | null>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#666' },
+        cardBackground: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        specialtyItem: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#fff',
+            borderColor: isDark ? '#333' : '#eee',
+        },
+        iconColor: isDark ? '#ccc' : '#666',
+        historyContainer: { backgroundColor: isDark ? '#111' : '#f9f9f9' },
+        bottomBar: { backgroundColor: isDark ? '#000' : '#fff' },
+    };
 
     useEffect(() => {
         const fetchPlaceDetails = async () => {
@@ -69,16 +87,16 @@ export default function PlaceDetailsScreen() {
 
     if (loading) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <ActivityIndicator size="large" color="#000" />
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     if (!place) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <Text>Place not found.</Text>
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>Place not found.</Text>
                 <TouchableOpacity style={styles.backButtonSimple} onPress={() => router.back()}>
                     <Text style={{ color: 'blue' }}>Go Back</Text>
                 </TouchableOpacity>
@@ -87,7 +105,7 @@ export default function PlaceDetailsScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -115,49 +133,49 @@ export default function PlaceDetailsScreen() {
                 </View>
 
                 {/* Info Cards */}
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, dynamicStyles.cardBackground]}>
                     <View style={styles.infoCard}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="map-marker" size={16} color="#666" />
+                            <FontAwesome name="map-marker" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>Location</Text>
-                            <Text style={styles.infoValue}>{place.location}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>Location</Text>
+                            <Text style={[styles.infoValue, dynamicStyles.subText]}>{place.location}</Text>
                         </View>
                     </View>
                     <View style={[styles.infoCard, { marginLeft: 10 }]}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="clock-o" size={16} color="#666" />
+                            <FontAwesome name="clock-o" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>{place.time}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>{place.time}</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* Specialty */}
-                <Text style={styles.sectionHeader}>Specialty</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Specialty</Text>
                 <View style={styles.specialtyRow}>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="wifi" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>WiFi</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="wifi" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>WiFi</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="camera" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Photography</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="camera" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Photography</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="group" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Public</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="group" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Public</Text>
                     </View>
                 </View>
 
                 {/* Description */}
-                <Text style={styles.sectionHeader}>Description</Text>
-                <Text style={styles.descriptionText}>{place.description}</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Description</Text>
+                <Text style={[styles.descriptionText, dynamicStyles.subText]}>{place.description}</Text>
 
                 {/* Images */}
-                <Text style={styles.sectionHeader}>Images</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Images</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
                     {place.images.map((img, index) => (
                         <Image key={index} source={{ uri: img }} style={styles.galleryImage} />
@@ -165,16 +183,16 @@ export default function PlaceDetailsScreen() {
                 </ScrollView>
 
                 {/* Historical Story */}
-                <View style={styles.historyContainer}>
-                    <Text style={[styles.sectionHeader, { marginTop: 0 }]}>Historical story</Text>
-                    <Text style={styles.descriptionText}>{place.historicalStory}</Text>
+                <View style={[styles.historyContainer, dynamicStyles.historyContainer]}>
+                    <Text style={[styles.sectionHeader, { marginTop: 0 }, dynamicStyles.text]}>Historical story</Text>
+                    <Text style={[styles.descriptionText, dynamicStyles.subText]}>{place.historicalStory}</Text>
                 </View>
 
                 <View style={{ height: 120 }} />
             </ScrollView>
 
             {/* Bottom Action Bar */}
-            <View style={styles.bottomBar}>
+            <View style={[styles.bottomBar, dynamicStyles.bottomBar]}>
                 <TouchableOpacity style={styles.bookButton}>
                     <Text style={styles.bookButtonText}>Directions</Text>
                 </TouchableOpacity>

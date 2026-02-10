@@ -40,14 +40,24 @@ const DUMMY_BANNERS: BannerItem[] = [
     }
 ];
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function BannerCarousel() {
     const [activeIndex, setActiveIndex] = useState(0);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const slideSize = event.nativeEvent.layoutMeasurement.width;
         const index = event.nativeEvent.contentOffset.x / slideSize;
         const roundIndex = Math.round(index);
         setActiveIndex(roundIndex);
+    };
+
+    const dynamicStyles = {
+        dateTag: { backgroundColor: isDark ? '#1c1c1e' : '#fff' },
+        dateText: { color: isDark ? '#FFD700' : '#000' },
+        paginationDotInactive: { backgroundColor: isDark ? '#444' : '#ccc' },
     };
 
     return (
@@ -75,8 +85,8 @@ export default function BannerCarousel() {
                                 <Text style={styles.registerText}>Register Now</Text>
                             </View>
                         </View>
-                        <View style={styles.dateTag}>
-                            <Text style={styles.dateText}>{item.date}</Text>
+                        <View style={[styles.dateTag, dynamicStyles.dateTag]}>
+                            <Text style={[styles.dateText, dynamicStyles.dateText]}>{item.date}</Text>
                         </View>
                     </TouchableOpacity>
                 ))}
@@ -89,7 +99,7 @@ export default function BannerCarousel() {
                         key={index}
                         style={[
                             styles.paginationDot,
-                            activeIndex === index ? styles.paginationDotActive : styles.paginationDotInactive
+                            activeIndex === index ? styles.paginationDotActive : dynamicStyles.paginationDotInactive
                         ]}
                     />
                 ))}

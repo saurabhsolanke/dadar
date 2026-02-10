@@ -22,12 +22,18 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#FFD700', // Yellow tint
-        tabBarInactiveTintColor: '#000',
+        tabBarInactiveTintColor: colorScheme === 'dark' ? '#ccc' : '#000',
         headerShown: true,
+        headerStyle: {
+            backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+        },
+        headerTintColor: colorScheme === 'dark' ? '#FFD700' : '#000',
         tabBarStyle: {
           height: 70,
           paddingBottom: 10,
           paddingTop: 10,
+          backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+          borderTopColor: colorScheme === 'dark' ? '#333' : '#eee', // Optional: separator
         },
         tabBarLabelStyle: {
           fontSize: 10,
@@ -42,7 +48,8 @@ export default function TabLayout() {
           headerTitle: 'Welcome To Dadar',
           headerTitleStyle: {
             fontWeight: 'bold',
-            fontSize: 20
+            fontSize: 20,
+            color: colorScheme === 'dark' ? '#FFD700' : '#000',
           },
           headerRight: () => <AppHeaderRight />,
         }}
@@ -63,6 +70,7 @@ export default function TabLayout() {
           headerTitleStyle: {
             fontSize: 18,
             fontWeight: 'bold',
+            color: colorScheme === 'dark' ? '#FFD700' : '#000',
           },
           headerShadowVisible: false,
           headerLeft: () => <AppHeaderLeft />,

@@ -11,8 +11,13 @@ interface HistoryCardProps {
     width?: number;
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function HistoryCard({ title, description, est, image, onPress, width = 200 }: HistoryCardProps) {
-     // Helper to process image source
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    // Helper to process image source
     let source = image;
     if (image && typeof image === 'object' && image.uri && typeof image.uri === 'string') {
         const url = image.uri;
@@ -20,14 +25,22 @@ export default function HistoryCard({ title, description, est, image, onPress, w
             source = { ...image, uri: url.replace('.heic', '.jpg') };
         }
     }
+
+    const dynamicStyles = {
+        card: { backgroundColor: isDark ? '#1c1c1e' : '#fff' },
+        title: { color: isDark ? '#fff' : '#000' },
+        description: { color: isDark ? '#ccc' : '#666' },
+        imageBg: { backgroundColor: isDark ? '#333' : '#f0f0f0' },
+    };
+
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }]}>
-            <View style={styles.imageContainer}>
+        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }, dynamicStyles.card]}>
+            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
             <View style={styles.contentContainer}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <Text style={styles.description} numberOfLines={2}>{description}</Text>
+                <Text style={[styles.title, dynamicStyles.title]} numberOfLines={1}>{title}</Text>
+                <Text style={[styles.description, dynamicStyles.description]} numberOfLines={2}>{description}</Text>
                 <View style={styles.footer}>
                     <Ionicons name="time" size={14} color="#007AFF" />
                     <Text style={styles.estText}>{est}</Text>

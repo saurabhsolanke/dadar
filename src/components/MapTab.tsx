@@ -1,4 +1,6 @@
+import { MapStyleDark } from '@/constants/MapStyles';
 import { db } from '@/src/config/firebase';
+import { useTheme } from '@/src/context/ThemeContext';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { collection, getDocs } from 'firebase/firestore';
@@ -28,6 +30,8 @@ export default function MapTab() {
     const router = useRouter();
     const [items, setItems] = useState<MapItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
 
     useEffect(() => {
         const fetchMapData = async () => {
@@ -82,20 +86,21 @@ export default function MapTab() {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FFD700" />
+            <View style={[styles.loadingContainer, { backgroundColor: isDark ? '#000' : '#fff' }]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: isDark ? '#000' : '#fff' }]}>
             <MapView
                 style={styles.map}
                 initialRegion={DADAR_REGION}
                 provider={PROVIDER_DEFAULT}
                 showsUserLocation={true}
                 showsMyLocationButton={true}
+                customMapStyle={isDark ? MapStyleDark : []}
             >
                 {items.map((item) => (
                     <Marker

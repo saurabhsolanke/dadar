@@ -1,4 +1,3 @@
-import { useColorScheme } from '@/components/useColorScheme';
 import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import HotelCard from '@/src/components/HotelCard';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -22,11 +21,26 @@ interface PlaceItem {
     image: { uri: string };
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function PlacesScreen() {
     const router = useRouter();
-    const colorScheme = useColorScheme();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [places, setPlaces] = useState<PlaceItem[]>([]);
     const [loading, setLoading] = useState(true);
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : 'black' },
+        searchContainer: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#F5F5F5',
+            borderColor: isDark ? '#333' : '#000',
+        },
+        searchIcon: { color: isDark ? '#888' : '#000' },
+        placeholderText: { color: isDark ? '#888' : '#666' },
+        headerIcon: { color: isDark ? '#fff' : 'black' },
+    };
 
     useEffect(() => {
         const fetchPlaces = async () => {
@@ -72,20 +86,23 @@ export default function PlacesScreen() {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, dynamicStyles.container]}>
             {/* Custom Header to match the screenshot 'Historical Places' */}
             <Stack.Screen
                 options={{
                     headerTitle: 'Places',
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
-                            <FontAwesome name="arrow-left" size={20} color="black" />
+                            <FontAwesome name="arrow-left" size={20} color={dynamicStyles.headerIcon.color} />
                         </TouchableOpacity>
                     ),
                     headerRight: () => <AppHeaderRight />,
                     headerTitleStyle: {
                         fontSize: 18,
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        color: isDark ? '#fff' : '#000',
                     }
                 }}
             />
@@ -93,21 +110,21 @@ export default function PlacesScreen() {
             {/* <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}> */}
             {/* Search Bar */}
             <TouchableOpacity
-                style={styles.searchContainer}
+                style={[styles.searchContainer, dynamicStyles.searchContainer]}
                 activeOpacity={1}
                 onPress={() => router.push('/search')}
             >
                 <TextInput
-                    style={styles.content}
+                    style={styles.contentInput}
                     placeholder="Search Hotel,Places,Events"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
                     editable={false}
                     pointerEvents="none"
                 />
-                <FontAwesome name="search" size={20} color="#000" />
+                <FontAwesome name="search" size={20} color={dynamicStyles.searchIcon.color} />
             </TouchableOpacity>
 
-            <Text style={styles.sectionTitle}>Places</Text>
+            <Text style={[styles.sectionTitle, dynamicStyles.text]}>Places</Text>
 
             <View style={styles.content}>
                 {loading ? (
@@ -185,9 +202,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginTop: 10,
     },
-    contentInput: { // Renamed from 'content' to avoid conflict or clarify
+    contentInput: {
         flex: 1,
-        paddingHorizontal: 15, // Adjusted to match event/places (styles.content)
+        paddingHorizontal: 15,
     },
     content: {
         flex: 1,

@@ -18,11 +18,29 @@ interface HotelDetails {
     images: string[];
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function HotelDetailsScreen() {
     const { id, title: paramTitle } = useLocalSearchParams();
     const router = useRouter();
     const [hotel, setHotel] = useState<HotelDetails | null>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#666' },
+        cardBackground: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        specialtyItem: { 
+            backgroundColor: isDark ? '#1c1c1e' : '#fff',
+            borderColor: isDark ? '#333' : '#eee',
+        },
+        iconColor: isDark ? '#ccc' : '#666',
+        historyContainer: { backgroundColor: isDark ? '#111' : '#f9f9f9' },
+        bottomBar: { backgroundColor: isDark ? '#000' : '#fff' }, // Ensure bottom bar blends or stands out
+    };
 
     useEffect(() => {
         const fetchHotelDetails = async () => {
@@ -78,16 +96,16 @@ export default function HotelDetailsScreen() {
 
     if (loading) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <ActivityIndicator size="large" color="#000" />
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     if (!hotel) {
         return (
-            <View style={[styles.container, styles.centerContent]}>
-                <Text>Hotel not found.</Text>
+            <View style={[styles.container, styles.centerContent, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>Hotel not found.</Text>
                 <TouchableOpacity style={styles.backButtonSimple} onPress={() => router.back()}>
                     <Text style={{ color: 'blue' }}>Go Back</Text>
                 </TouchableOpacity>
@@ -96,7 +114,7 @@ export default function HotelDetailsScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{ headerShown: false }} />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -124,49 +142,49 @@ export default function HotelDetailsScreen() {
                 </View>
 
                 {/* Info Cards */}
-                <View style={styles.infoRow}>
+                <View style={[styles.infoRow, dynamicStyles.cardBackground]}>
                     <View style={styles.infoCard}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="map-marker" size={16} color="#666" />
+                            <FontAwesome name="map-marker" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>Location</Text>
-                            <Text style={styles.infoValue}>{hotel.location}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>Location</Text>
+                            <Text style={[styles.infoValue, dynamicStyles.subText]}>{hotel.location}</Text>
                         </View>
                     </View>
                     <View style={[styles.infoCard, { marginLeft: 10 }]}>
                         <View style={styles.infoIcon}>
-                            <FontAwesome name="clock-o" size={16} color="#666" />
+                            <FontAwesome name="clock-o" size={16} color={dynamicStyles.iconColor} />
                         </View>
                         <View>
-                            <Text style={styles.infoLabel}>{hotel.time}</Text>
+                            <Text style={[styles.infoLabel, dynamicStyles.text]}>{hotel.time}</Text>
                         </View>
                     </View>
                 </View>
 
                 {/* Specialty */}
-                <Text style={styles.sectionHeader}>Specialty</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Specialty</Text>
                 <View style={styles.specialtyRow}>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="wifi" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>WiFi</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="wifi" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>WiFi</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="calendar" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Event</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="calendar" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Event</Text>
                     </View>
-                    <View style={styles.specialtyItem}>
-                        <FontAwesome name="group" size={24} color="#666" />
-                        <Text style={styles.specialtyText}>Meeting space</Text>
+                    <View style={[styles.specialtyItem, dynamicStyles.specialtyItem]}>
+                        <FontAwesome name="group" size={24} color={dynamicStyles.iconColor} />
+                        <Text style={[styles.specialtyText, dynamicStyles.text]}>Meeting space</Text>
                     </View>
                 </View>
 
                 {/* Description */}
-                <Text style={styles.sectionHeader}>Description</Text>
-                <Text style={styles.descriptionText}>{hotel.description}</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Description</Text>
+                <Text style={[styles.descriptionText, dynamicStyles.subText]}>{hotel.description}</Text>
 
                 {/* Images */}
-                <Text style={styles.sectionHeader}>Images</Text>
+                <Text style={[styles.sectionHeader, dynamicStyles.text]}>Images</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
                     {hotel.images.map((img, index) => (
                         <Image key={index} source={{ uri: img }} style={styles.galleryImage} />
@@ -177,16 +195,16 @@ export default function HotelDetailsScreen() {
                 <View style={{ height: 120 }} />
 
                 {/* Historical Story */}
-                <View style={styles.historyContainer}>
-                    <Text style={[styles.sectionHeader, { marginTop: 0 }]}>Historical story</Text>
-                    <Text style={styles.descriptionText}>{hotel.historicalStory}</Text>
+                <View style={[styles.historyContainer, dynamicStyles.historyContainer]}>
+                    <Text style={[styles.sectionHeader, { marginTop: 0 }, dynamicStyles.text]}>Historical story</Text>
+                    <Text style={[styles.descriptionText, dynamicStyles.subText]}>{hotel.historicalStory}</Text>
                 </View>
 
                 <View style={{ height: 50 }} />
             </ScrollView>
 
             {/* Bottom Action Bar */}
-            <View style={styles.bottomBar}>
+            <View style={[styles.bottomBar, dynamicStyles.bottomBar]}>
                 <TouchableOpacity style={styles.bookButton} onPress={handleDirections}>
                     <Text style={styles.bookButtonText}>Directions</Text>
                 </TouchableOpacity>

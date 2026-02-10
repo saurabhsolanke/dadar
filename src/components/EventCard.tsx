@@ -9,15 +9,26 @@ interface EventCardProps {
     width?: number;
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function EventCard({ title, description, image, onPress, width = 340 }: EventCardProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        card: { backgroundColor: isDark ? '#1c1c1e' : '#fff' },
+        title: { color: isDark ? '#fff' : '#000' },
+        description: { color: isDark ? '#ccc' : '#666' },
+    };
+
     return (
-        <View style={[styles.card, { width }]}>
+        <View style={[styles.card, { width }, dynamicStyles.card]}>
             <View style={styles.imageContainer}>
                 <Image source={image} style={styles.image} resizeMode="cover" />
             </View>
             <View style={styles.contentContainer}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <Text style={styles.description} numberOfLines={3}>{description}</Text>
+                <Text style={[styles.title, dynamicStyles.title]} numberOfLines={1}>{title}</Text>
+                <Text style={[styles.description, dynamicStyles.description]} numberOfLines={3}>{description}</Text>
                 <TouchableOpacity style={styles.button} onPress={onPress}>
                     <Text style={styles.buttonText}>Inquiry Now</Text>
                 </TouchableOpacity>

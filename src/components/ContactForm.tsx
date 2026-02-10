@@ -8,9 +8,14 @@ import Toast from 'react-native-toast-message'; // Added Toast
 import { db } from '../config/firebase';
 import { useAuth } from '../hooks/useAuth';
 
+import { useTheme } from '../context/ThemeContext';
+
 const ContactForm = () => {
     const router = useRouter(); // Initialize router
     const { user } = useAuth();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+    
     const [budget, setBudget] = useState(10000);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -20,6 +25,21 @@ const ContactForm = () => {
         eventDetails: '',
         message: '',
     });
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#1c1c1e' : 'white' },
+        text: { color: isDark ? '#fff' : '#000' },
+        label: { color: isDark ? '#ccc' : '#555' },
+        input: { 
+            backgroundColor: isDark ? '#2c2c2e' : '#fff',
+            borderColor: isDark ? '#444' : '#e0e0e0',
+            color: isDark ? '#fff' : '#000'
+        },
+        placeholderText: { color: isDark ? '#888' : '#999' },
+        sliderContainer: { borderColor: isDark ? '#444' : '#e0e0e0' },
+        divider: { backgroundColor: isDark ? '#333' : '#f0f0f0' },
+        footerText: { color: isDark ? '#ccc' : '#333' },
+    };
 
     useEffect(() => {
         if (user) {
@@ -94,42 +114,46 @@ const ContactForm = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Contact Form</Text>
+        <View style={[styles.container, dynamicStyles.container]}>
+            <Text style={[styles.header, dynamicStyles.text]}>Contact Form</Text>
 
             <View style={styles.inputGroup}>
                 <TextInput
                     placeholder="Name"
-                    style={styles.input}
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
+                    style={[styles.input, dynamicStyles.input]}
                     value={formData.name}
                     onChangeText={(text) => handleChange('name', text)}
                 />
                 <TextInput
                     placeholder="Email"
-                    style={styles.input}
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
+                    style={[styles.input, dynamicStyles.input]}
                     keyboardType="email-address"
                     value={formData.email}
                     onChangeText={(text) => handleChange('email', text)}
                 />
                 <TextInput
                     placeholder="Address"
-                    style={styles.input}
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
+                    style={[styles.input, dynamicStyles.input]}
                     value={formData.address}
                     onChangeText={(text) => handleChange('address', text)}
                 />
                 <TextInput
                     placeholder="Event Details"
-                    style={styles.input}
+                    placeholderTextColor={dynamicStyles.placeholderText.color}
+                    style={[styles.input, dynamicStyles.input]}
                     value={formData.eventDetails}
                     onChangeText={(text) => handleChange('eventDetails', text)}
                 />
             </View>
 
-            <View style={styles.sliderContainer}>
+            <View style={[styles.sliderContainer, dynamicStyles.sliderContainer]}>
                 <View style={styles.sliderHeader}>
-                    <Text style={styles.label}>Select your budget</Text>
+                    <Text style={[styles.label, dynamicStyles.label]}>Select your budget</Text>
                     <View style={styles.budgetBadge}>
-                        <Text style={styles.budgetText}>{budget.toLocaleString()}</Text>
+                        <Text style={[styles.budgetText, dynamicStyles.text]}>{budget.toLocaleString()}</Text>
                     </View>
                 </View>
                 <Slider
@@ -138,7 +162,7 @@ const ContactForm = () => {
                     maximumValue={100000}
                     step={1000}
                     minimumTrackTintColor="#FFD700"
-                    maximumTrackTintColor="#d3d3d3"
+                    maximumTrackTintColor={isDark ? "#444" : "#d3d3d3"}
                     thumbTintColor="#FFD700"
                     value={budget}
                     onValueChange={setBudget}
@@ -147,7 +171,8 @@ const ContactForm = () => {
 
             <TextInput
                 placeholder="Message"
-                style={[styles.input, styles.textArea]}
+                placeholderTextColor={dynamicStyles.placeholderText.color}
+                style={[styles.input, styles.textArea, dynamicStyles.input]}
                 multiline
                 numberOfLines={4}
                 value={formData.message}
@@ -158,12 +183,12 @@ const ContactForm = () => {
                  {loading ? <ActivityIndicator color="#333" /> : <Text style={styles.buttonText}>Submit</Text>}
             </TouchableOpacity>
 
-            <View style={styles.divider} />
+            <View style={[styles.divider, dynamicStyles.divider]} />
 
             <View style={styles.footer}>
                 <View>
-                    <Text style={styles.footerText}>+9898478899</Text>
-                    <Text style={styles.footerText}>Dadar@gmail.com</Text>
+                    <Text style={[styles.footerText, dynamicStyles.footerText]}>+9898478899</Text>
+                    <Text style={[styles.footerText, dynamicStyles.footerText]}>Dadar@gmail.com</Text>
                 </View>
                 <View style={styles.socialIcons}>
                     <FontAwesome name="google" size={24} color="#DB4437" style={styles.icon} />

@@ -5,10 +5,21 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { db } from '../../src/config/firebase';
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function ExperienceDetailScreen() {
     const { id } = useLocalSearchParams();
     const [item, setItem] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#444' },
+        metaText: { color: isDark ? '#888' : '#888' },
+    };
 
     useEffect(() => {
         logScreenView(`Experience_Detail_${id}`);
@@ -37,25 +48,25 @@ export default function ExperienceDetailScreen() {
 
     if (loading) {
         return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#FFD700" />
+            <View style={[styles.center, dynamicStyles.container]}>
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
 
     if (!item) {
         return (
-            <View style={styles.center}>
-                <Text>Experience not found.</Text>
+            <View style={[styles.center, dynamicStyles.container]}>
+                <Text style={dynamicStyles.text}>Experience not found.</Text>
             </View>
         );
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Stack.Screen options={{ title: 'Experience' }} />
+        <ScrollView style={[styles.container, dynamicStyles.container]}>
+            <Stack.Screen options={{ title: 'Experience', headerStyle: { backgroundColor: isDark ? '#000' : '#fff' }, headerTintColor: isDark ? '#fff' : '#000' }} />
 
-            <Text style={styles.headerTitle}>{item.title}</Text>
+            <Text style={[styles.headerTitle, dynamicStyles.text]}>{item.title}</Text>
 
             {(() => {
                 const imageUrl = Array.isArray(item.image) 
@@ -70,9 +81,9 @@ export default function ExperienceDetailScreen() {
 
             <View style={styles.contentContainer}>
                 {item.author && (
-                    <Text style={styles.author}>By {item.author}</Text>
+                    <Text style={[styles.author, dynamicStyles.metaText]}>By {item.author}</Text>
                 )}
-                <Text style={styles.content}>{item.description || item.content}</Text>
+                <Text style={[styles.content, dynamicStyles.subText]}>{item.description || item.content}</Text>
             </View>
         </ScrollView>
     );

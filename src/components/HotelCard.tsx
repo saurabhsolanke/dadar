@@ -13,7 +13,12 @@ interface HotelCardProps {
     height?: number;
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function HotelCard({ id, title, distance, rating, image, onPress, width = 200, height = 250 }: HotelCardProps) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
     // Helper to process image source
     let source = image;
     if (image && typeof image === 'object' && image.uri && typeof image.uri === 'string') {
@@ -23,8 +28,14 @@ export default function HotelCard({ id, title, distance, rating, image, onPress,
         }
     }
 
+    const dynamicStyles = {
+        card: { backgroundColor: isDark ? '#1c1c1e' : '#fff' },
+        title: { color: isDark ? '#fff' : '#000' },
+        distance: { color: isDark ? '#ccc' : '#666' },
+    };
+
     return (
-        <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={[styles.card, { width }]}>
+        <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={[styles.card, { width }, dynamicStyles.card]}>
             <View style={[styles.imageContainer, { height: height - 80 }]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
                 <View style={styles.ratingBadge}>
@@ -33,8 +44,8 @@ export default function HotelCard({ id, title, distance, rating, image, onPress,
                 </View>
             </View>
             <View style={styles.infoContainer}>
-                <Text style={styles.title} numberOfLines={1}>{title}</Text>
-                <Text style={styles.distance}>{distance}</Text>
+                <Text style={[styles.title, dynamicStyles.title]} numberOfLines={1}>{title}</Text>
+                <Text style={[styles.distance, dynamicStyles.distance]}>{distance}</Text>
             </View>
         </TouchableOpacity>
     );

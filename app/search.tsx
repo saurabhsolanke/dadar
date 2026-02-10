@@ -13,12 +13,30 @@ interface SearchResult {
     type: 'hotel' | 'shop' | 'place' | 'event' | 'news' | 'blog';
 }
 
+import { useTheme } from '@/src/context/ThemeContext';
+
 export default function SearchScreen() {
     const { q } = useLocalSearchParams<{ q: string }>();
     const [queryText, setQueryText] = useState(q || '');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        header: { backgroundColor: isDark ? '#000' : '#fff', borderBottomColor: isDark ? '#333' : '#f0f0f0' },
+        searchBar: { backgroundColor: isDark ? '#1c1c1e' : '#f5f5f5' },
+        input: { color: isDark ? '#fff' : '#000' },
+        iconColor: isDark ? '#888' : '#666',
+        backIconColor: isDark ? '#fff' : 'black',
+        resultItem: { backgroundColor: isDark ? '#000' : '#fff', borderBottomColor: isDark ? '#333' : '#f9f9f9' },
+        resultTitle: { color: isDark ? '#fff' : '#333' },
+        resultDesc: { color: isDark ? '#aaa' : '#888' },
+        chevronColor: isDark ? '#555' : '#ccc',
+        emptyText: { color: isDark ? '#888' : '#666' },
+    };
 
     // Sync query text with URL param if it changes externally
     useEffect(() => {
@@ -111,16 +129,16 @@ export default function SearchScreen() {
     };
 
     const renderItem = ({ item }: { item: SearchResult }) => (
-        <TouchableOpacity style={styles.resultItem} onPress={() => navigateToDetail(item)}>
+        <TouchableOpacity style={[styles.resultItem, dynamicStyles.resultItem]} onPress={() => navigateToDetail(item)}>
             <Image source={item.image} style={styles.resultImage} />
             <View style={styles.resultContent}>
                 <View style={[styles.badge, { backgroundColor: getBadgeColor(item.type) }]}>
                     <Text style={styles.badgeText}>{item.type.toUpperCase()}</Text>
                 </View>
-                <Text style={styles.resultTitle}>{item.title}</Text>
-                <Text style={styles.resultDesc} numberOfLines={1}>{item.description}</Text>
+                <Text style={[styles.resultTitle, dynamicStyles.resultTitle]}>{item.title}</Text>
+                <Text style={[styles.resultDesc, dynamicStyles.resultDesc]} numberOfLines={1}>{item.description}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            <Ionicons name="chevron-forward" size={20} color={dynamicStyles.chevronColor} />
         </TouchableOpacity>
     );
 
@@ -135,21 +153,22 @@ export default function SearchScreen() {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            <View style={styles.header}>
+            <View style={[styles.header, dynamicStyles.header]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="black" />
+                    <Ionicons name="arrow-back" size={24} color={dynamicStyles.backIconColor} />
                 </TouchableOpacity>
-                <View style={styles.searchBar}>
-                    <Ionicons name="search" size={20} color="#666" style={{ marginRight: 8 }} />
+                <View style={[styles.searchBar, dynamicStyles.searchBar]}>
+                    <Ionicons name="search" size={20} color={dynamicStyles.iconColor} style={{ marginRight: 8 }} />
                     <TextInput
-                        style={styles.input}
+                        style={[styles.input, dynamicStyles.input]}
                         value={queryText}
                         onChangeText={setQueryText}
                         onSubmitEditing={handleSearchSubmit}
                         placeholder="Search Hotel, Places, Events..."
+                        placeholderTextColor={isDark ? '#888' : '#999'}
                         autoFocus={!q} // Auto focus if no query passed initially
                     />
                 </View>
@@ -169,7 +188,7 @@ export default function SearchScreen() {
                     keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={styles.center}>
-                            {queryText ? <Text style={{ color: '#666' }}>No results found for "{queryText}"</Text> : <Text style={{ color: '#666' }}>Start searching...</Text>}
+                            {queryText ? <Text style={dynamicStyles.emptyText}>No results found for "{queryText}"</Text> : <Text style={dynamicStyles.emptyText}>Start searching...</Text>}
                         </View>
                     }
                 />
