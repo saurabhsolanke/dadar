@@ -1,19 +1,18 @@
+import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import HotelCard from '@/src/components/HotelCard';
+import SkeletonLoader from '@/src/components/SkeletonLoader';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Stack, useRouter } from 'expo-router';
+import { collection, getDocs } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { db } from '../../src/config/firebase';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
 
-import { AppHeaderRight } from '@/src/components/AppHeaderRight';
-import SkeletonLoader from '@/src/components/SkeletonLoader';
-import { db } from '@/src/config/firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-
-interface EventItem {
+interface HotelItem {
     id: string;
     title: string;
     distance: string;
@@ -21,56 +20,48 @@ interface EventItem {
     image: { uri: string };
 }
 
-export default function EventScreen() {
+export default function HotelsScreen() {
     const router = useRouter();
-    const [events, setEvents] = useState<EventItem[]>([]);
+    const [hotels, setHotels] = useState<HotelItem[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const navigateTocontactus = () => {
-        router.push({
-            pathname: '/contact',
-        });
-    };
-
     useEffect(() => {
-        const fetchEvents = async () => {
+        const fetchHotels = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, 'events'));
-                const eventsList = querySnapshot.docs.map(doc => {
+                const querySnapshot = await getDocs(collection(db, "hotels"));
+                const hotelsList = querySnapshot.docs.map(doc => {
                     const data = doc.data();
-                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null);
                     return {
                         id: doc.id,
                         title: data.title,
-                        distance: data.location,
-                        rating: 4.5, // Default rating as events might not have it
-                        image: { uri: imageUrl }
+                        image: { uri: imageUrl },
+                        distance: data.location || "Unknown location",
+                        rating: data.rating || 4.5,
                     };
                 });
-                setEvents(eventsList);
+                setHotels(hotelsList);
             } catch (error) {
-                console.error("Error fetching events:", error);
+                console.error("Error fetching hotels:", error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchEvents();
+
+        fetchHotels();
     }, []);
 
-    const navigateToEvent = (id: string, title: string) => {
-        router.push({
-            pathname: '/event/[id]',
-            params: { id, title }
-        });
+    const navigateToHotel = (id: string, title: string) => {
+        router.push(`/hotel/${id}`);
     };
 
-    const renderItem = ({ item }: { item: EventItem }) => (
+    const renderItem = ({ item }: { item: HotelItem }) => (
         <HotelCard
             key={item.id}
             {...item}
             width={CARD_WIDTH}
             height={240}
-            onPress={() => navigateToEvent(item.id, item.title)}
+            onPress={() => navigateToHotel(item.id, item.title)}
         />
     );
 
@@ -78,7 +69,7 @@ export default function EventScreen() {
         <SafeAreaView style={styles.container}>
             <Stack.Screen
                 options={{
-                    headerTitle: 'Historical Event',
+                    headerTitle: 'Hotels',
                     headerLeft: () => (
                         <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
                             <FontAwesome name="arrow-left" size={20} color="black" />
@@ -92,15 +83,13 @@ export default function EventScreen() {
                 }}
             />
 
-            {/* <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}> */}
-            {/* Search Bar */}
             <TouchableOpacity
                 style={styles.searchContainer}
                 activeOpacity={1}
                 onPress={() => router.push('/search')}
             >
                 <TextInput
-                    style={styles.content}
+                    style={styles.contentInput}
                     placeholder="Search Hotel,Places,Events"
                     placeholderTextColor="#666"
                     editable={false}
@@ -109,13 +98,7 @@ export default function EventScreen() {
                 <FontAwesome name="search" size={20} color="#000" />
             </TouchableOpacity>
 
-            <View style={styles.headerRow}>
-                <Text style={styles.sectionTitle}>Events</Text>
-                <TouchableOpacity style={styles.organiseButton} onPress={navigateTocontactus}>
-                    <Text style={styles.organiseText}>Organise Your Event</Text>
-                </TouchableOpacity>
-            </View>
-
+            <Text style={styles.sectionTitle}>Hotels</Text>
 
             <View style={styles.content}>
                 {loading ? (
@@ -141,7 +124,7 @@ export default function EventScreen() {
                     </View>
                 ) : (
                     <FlatList
-                        data={events}
+                        data={hotels}
                         renderItem={renderItem}
                         keyExtractor={(item) => item.id}
                         numColumns={2}
@@ -152,9 +135,7 @@ export default function EventScreen() {
                 )}
             </View>
 
-            {/* Bottom padding for tab bar */}
             <View style={{ height: 80 }} />
-            {/* </ScrollView> */}
         </SafeAreaView>
     );
 }
@@ -169,7 +150,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         paddingTop: Platform.OS === 'android' ? 20 : 0,
     },
-
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -183,9 +163,9 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         marginTop: 10,
     },
-    contentInput: { // Renamed from 'content' to avoid conflict or clarify
+    contentInput: {
         flex: 1,
-        paddingHorizontal: 15, // Adjusted to match event/places (styles.content)
+        paddingHorizontal: 15,
     },
     content: {
         flex: 1,
@@ -194,26 +174,9 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginLeft: 20, // Keep left margin for alignment
-    },
-    headerRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingRight: 20, // Padding for the button
         marginBottom: 15,
         marginTop: 10,
-    },
-    organiseButton: {
-        backgroundColor: '#FFD700', // Yellow
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 20,
-    },
-    organiseText: {
-        fontSize: 13, // Slightly larger for readability
-        fontWeight: 'bold',
-        color: '#000',
+        marginLeft: 20,
     },
     listContent: {
         paddingBottom: 20,
@@ -222,19 +185,4 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 15,
     },
-    //    headerTop: {
-    //        flexDirection: 'row',
-    //        justifyContent: 'space-between',
-    //        alignItems: 'center',
-    //        marginBottom: 15,
-    //    },
-    //    headerTitle: {
-    //        fontSize: 18,
-    //        fontWeight: 'bold',
-    //        display: 'none', // Hidden based on design, often handled by navigation header or just custom
-    //    },
-    //    searchPlaceholder: {
-    //        color: '#999',
-    //        fontSize: 14,
-    //    },
 });

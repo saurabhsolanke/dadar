@@ -2,11 +2,12 @@ import BannerCarousel from '@/src/components/BannerCarousel';
 import HistoryCard from '@/src/components/HistoryCard';
 import HotelCard from '@/src/components/HotelCard';
 import NewsCard from '@/src/components/NewsCard';
+import SkeletonLoader from '@/src/components/SkeletonLoader';
 import { logScreenView } from '@/src/services/logging';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import EventCard from '@/src/components/EventCard';
 import { db } from '@/src/config/firebase';
@@ -65,10 +66,10 @@ export default function HomeScreen() {
   const viewportWidth = Dimensions.get('window').width;
 
   const handleEventScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const slideSize = event.nativeEvent.layoutMeasurement.width;
-      const index = event.nativeEvent.contentOffset.x / slideSize;
-      const roundIndex = Math.round(index);
-      setActiveEventIndex(roundIndex);
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const index = event.nativeEvent.contentOffset.x / slideSize;
+    const roundIndex = Math.round(index);
+    setActiveEventIndex(roundIndex);
   };
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function HomeScreen() {
         const hotelsSnapshot = await getDocs(hotelsQuery);
         const hotelsList = hotelsSnapshot.docs.map(doc => {
           const data = doc.data();
-          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
+          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
           return {
             id: doc.id,
             title: data.title || 'Untitled',
@@ -97,7 +98,7 @@ export default function HomeScreen() {
         const shopsSnapshot = await getDocs(shopsQuery);
         const shopsList = shopsSnapshot.docs.map(doc => {
           const data = doc.data();
-          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
+          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
           return {
             id: doc.id,
             title: data.name || 'Untitled', // 'name' in db, 'title' in UI
@@ -112,15 +113,15 @@ export default function HomeScreen() {
         const historyQuery = query(collection(db, 'places'), limit(5));
         const historySnapshot = await getDocs(historyQuery);
         const historyList = historySnapshot.docs.map(doc => {
-            const data = doc.data();
-            const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-            return {
-                id: doc.id,
-                title: data.title || 'Untitled',
-                description: data.description || '',
-                est: data.est || data.established || '',
-                image: { uri: imageUrl }
-            };
+          const data = doc.data();
+          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+          return {
+            id: doc.id,
+            title: data.title || 'Untitled',
+            description: data.description || '',
+            est: data.est || data.established || '',
+            image: { uri: imageUrl }
+          };
         });
         setHistory(historyList);
 
@@ -128,31 +129,31 @@ export default function HomeScreen() {
         const newsQuery = query(collection(db, 'news'), limit(5));
         const newsSnapshot = await getDocs(newsQuery);
         const newsList = newsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-            return {
-                id: doc.id,
-                title: data.headline || data.title || 'Untitled',
-                content: data.summary || '',
-                image: { uri: imageUrl }
-            };
+          const data = doc.data();
+          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+          return {
+            id: doc.id,
+            title: data.headline || data.title || 'Untitled',
+            content: data.summary || '',
+            image: { uri: imageUrl }
+          };
         });
         setNews(newsList);
 
-         // Fetch Events
+        // Fetch Events
         const eventsQuery = query(collection(db, 'events'), limit(5));
         const eventsSnapshot = await getDocs(eventsQuery);
         const eventsList = eventsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-            return {
-                id: doc.id,
-                title: data.title || 'Untitled',
-                description: data.description || '',
-                location: data.location || 'Unknown',
-                organizer: data.organizer || 'Unknown',
-                image: { uri: imageUrl }
-            };
+          const data = doc.data();
+          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+          return {
+            id: doc.id,
+            title: data.title || 'Untitled',
+            description: data.description || '',
+            location: data.location || 'Unknown',
+            organizer: data.organizer || 'Unknown',
+            image: { uri: imageUrl }
+          };
         });
         setEvents(eventsList);
 
@@ -173,19 +174,19 @@ export default function HomeScreen() {
     });
   };
 
-   const navigateToShop = (id: string, title: string) => {
+  const navigateToShop = (id: string, title: string) => {
     router.push({
       pathname: '/shop/[id]',
       params: { id, title }
     });
   };
-   const navigateToPlaces = (id: string, title: string) => {
+  const navigateToPlaces = (id: string, title: string) => {
     router.push({
       pathname: '/place/[id]',
       params: { id, title }
     });
   };
-   const navigateToNews = (id: string, title: string) => {
+  const navigateToNews = (id: string, title: string) => {
     router.push({
       pathname: '/news/[id]',
       params: { id, title }
@@ -202,9 +203,9 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
       {/* Search Bar */}
-      <TouchableOpacity 
-        style={styles.searchContainer} 
-        activeOpacity={1} 
+      <TouchableOpacity
+        style={styles.searchContainer}
+        activeOpacity={1}
         onPress={() => router.push('/search')}
       >
         <TextInput
@@ -223,10 +224,21 @@ export default function HomeScreen() {
       {/* Hotels Section */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Hotel's in Dadar</Text>
+        <TouchableOpacity onPress={() => router.push('/hotels')}>
+            <Text style={styles.seeAllText}>See All</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-          <ActivityIndicator size="small" color="#000" style={{ marginLeft: 20 }} />
+          <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+            {[1, 2, 3].map((i) => (
+              <View key={i} style={{ width: 200, marginRight: 15 }}>
+                <SkeletonLoader height={120} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={20} width="80%" borderRadius={4} style={{ marginBottom: 4 }} />
+                <SkeletonLoader height={16} width="60%" borderRadius={4} />
+              </View>
+            ))}
+          </View>
         ) : (
           hotels.map((item) => (
             <HotelCard
@@ -241,10 +253,21 @@ export default function HomeScreen() {
       {/* Shops Section */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Best Shop In Dadar</Text>
+        <TouchableOpacity onPress={() => router.push('/places')}>
+            <Text style={styles.seeAllText}>See All</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-          <ActivityIndicator size="small" color="#000" style={{ marginLeft: 20 }} />
+           <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+            {[1, 2, 3].map((i) => (
+              <View key={i} style={{ width: 200, marginRight: 15 }}>
+                <SkeletonLoader height={120} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={20} width="70%" borderRadius={4} style={{ marginBottom: 4 }} />
+                <SkeletonLoader height={16} width="50%" borderRadius={4} />
+              </View>
+            ))}
+          </View>
         ) : (
           shops.map((item) => (
             <HotelCard
@@ -258,83 +281,112 @@ export default function HomeScreen() {
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Organise Your Event</Text>
+        <TouchableOpacity onPress={() => router.push('/event')}>
+            <Text style={styles.seeAllText}>See All</Text>
+        </TouchableOpacity>
       </View>
       <View>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
-            pagingEnabled 
-            onScroll={handleEventScroll}
-            scrollEventThrottle={16}
-            contentContainerStyle={styles.listContainer}
-          >
-              {events.map((event, index) => (
-                  <EventCard 
+         {loading ? (
+             <View style={{ paddingLeft: 20 }}>
+                 <SkeletonLoader height={200} width={viewportWidth - 40} borderRadius={12} />
+             </View>
+         ) : (
+             <>
+                <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled
+                onScroll={handleEventScroll}
+                scrollEventThrottle={16}
+                contentContainerStyle={styles.listContainer}
+                >
+                {events.map((event, index) => (
+                    <EventCard
                     key={index}
                     title={event.title}
                     description={event.description}
                     image={event.image}
                     width={viewportWidth - 40}
                     onPress={() => navigateToEvent(event.id, event.title)} // Full width minus margins
-                  />
-              ))}
-          </ScrollView>
-          {/* Pagination Dots */}
-          <View style={styles.paginationContainer}>
-              {events.map((_, index) => (
-                  <View 
-                    key={index} 
+                    />
+                ))}
+                </ScrollView>
+                {/* Pagination Dots */}
+                <View style={styles.paginationContainer}>
+                {events.map((_, index) => (
+                    <View
+                    key={index}
                     style={[
-                        styles.paginationDot, 
+                        styles.paginationDot,
                         activeEventIndex === index ? styles.paginationDotActive : styles.paginationDotInactive
-                    ]} 
-                  />
-              ))}
-          </View>
+                    ]}
+                    />
+                ))}
+                </View>
+            </>
+         )}
       </View>
 
       {/* Historical Places Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Historical Places</Text>
-        <TouchableOpacity>
-           <Text style={{color: '#007AFF', fontWeight: 'bold'}}>Explore All</Text>
+        <Text style={styles.sectionTitle}>historical Places</Text>
+        <TouchableOpacity onPress={() => router.push('/places')}>
+          <Text style={styles.seeAllText}>See All</Text>
         </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
-          {loading ? (
-             <ActivityIndicator size="small" color="#000" style={{ marginLeft: 20 }} />
-          ) : (
-            history.map((item) => (
-                <HistoryCard 
-                    key={item.id}
-                    title={item.title}
-                    description={item.description}
-                    est={item.est}
-                    image={item.image}
-                    onPress={() => navigateToPlaces(item.id, item.title)}
-                />
-            ))
-          )}
+        {loading ? (
+             <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+            {[1, 2, 3].map((i) => (
+              <View key={i} style={{ width: 180, marginRight: 15 }}>
+                <SkeletonLoader height={140} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={18} width="90%" borderRadius={4} />
+              </View>
+            ))}
+          </View>
+        ) : (
+          history.map((item) => (
+            <HistoryCard
+              key={item.id}
+              title={item.title}
+              description={item.description}
+              est={item.est}
+              image={item.image}
+              onPress={() => navigateToPlaces(item.id, item.title)}
+            />
+          ))
+        )}
       </ScrollView>
 
       {/* News & Blog Section */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>News & Blog</Text>
+         <TouchableOpacity onPress={() => router.push('/news-feed')}>
+            <Text style={styles.seeAllText}>See All</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
-          {loading ? (
-             <ActivityIndicator size="small" color="#000" style={{ marginLeft: 20 }} />
-          ) : (
-            news.map((item) => (
-                <NewsCard 
-                    key={item.id}
-                    title={item.title}
-                    content={item.content}
-                    image={item.image}
-                    onPress={() => navigateToNews(item.id, item.title)}
-                />
-            ))
-          )}
+        {loading ? (
+            <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+            {[1, 2, 3].map((i) => (
+              <View key={i} style={{ width: 250, marginRight: 15 }}>
+                <SkeletonLoader height={150} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={20} width="95%" borderRadius={4} style={{ marginBottom: 4 }} />
+                <SkeletonLoader height={16} width="100%" borderRadius={4} />
+              </View>
+            ))}
+          </View>
+        ) : (
+          news.map((item) => (
+            <NewsCard
+              key={item.id}
+              title={item.title}
+              content={item.content}
+              image={item.image}
+              onPress={() => navigateToNews(item.id, item.title)}
+            />
+          ))
+        )}
       </ScrollView>
 
       {/* Added bottom padding for tab bar */}
@@ -373,6 +425,11 @@ const styles = StyleSheet.create({
     top: 15,
   },
 
+  seeAllText: {
+    color: '#007AFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -403,9 +460,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   paginationDotActive: {
-      backgroundColor: '#FFD700', // Yellow
+    backgroundColor: '#FFD700', // Yellow
   },
   paginationDotInactive: {
-      backgroundColor: '#ccc', // Grey
+    backgroundColor: '#ccc', // Grey
   },
 });

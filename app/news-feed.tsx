@@ -37,8 +37,8 @@ export default function NewsFeed() {
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-                    
+                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+
                     fetchedData.push({
                         id: doc.id,
                         title: data.title || data.headline || 'Untitled',
@@ -80,7 +80,7 @@ export default function NewsFeed() {
 
     return (
         <View style={styles.container}>
-            <Stack.Screen options={{ 
+            <Stack.Screen options={{
                 headerShown: true,
                 headerTitle: "News & Blog",
                 headerLeft: () => (
@@ -93,15 +93,15 @@ export default function NewsFeed() {
 
             {/* Tabs */}
             <View style={styles.tabContainer}>
-                <TouchableOpacity 
-                    style={[styles.tab, activeTab === 'news' && styles.activeTab]} 
+                <TouchableOpacity
+                    style={[styles.tab, activeTab === 'news' && styles.activeTab]}
                     onPress={() => setActiveTab('news')}
                 >
                     <FontAwesome name="newspaper-o" size={18} color={activeTab === 'news' ? 'black' : '#888'} />
                     <Text style={[styles.tabText, activeTab === 'news' && styles.activeTabText]}>News</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                    style={[styles.tab, activeTab === 'blog' && styles.activeTab]} 
+                <TouchableOpacity
+                    style={[styles.tab, activeTab === 'blog' && styles.activeTab]}
                     onPress={() => setActiveTab('blog')}
                 >
                     <Ionicons name="documents-outline" size={20} color={activeTab === 'blog' ? 'black' : '#888'} />
@@ -121,7 +121,7 @@ export default function NewsFeed() {
                     renderItem={({ item }) => {
                         if (activeTab === 'news') {
                             return (
-                                <NewsListItem 
+                                <NewsListItem
                                     image={item.image}
                                     title={item.title}
                                     content={item.description}
@@ -147,7 +147,7 @@ export default function NewsFeed() {
                     columnWrapperStyle={activeTab === 'blog' ? styles.row : undefined}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.center}><Text style={{color: '#888', marginTop: 20}}>No {activeTab === 'news' ? 'News' : 'Blogs'} Found</Text></View>
+                        <View style={styles.center}><Text style={{ color: '#888', marginTop: 20 }}>No {activeTab === 'news' ? 'News' : 'Blogs'} Found</Text></View>
                     }
                 />
             )}

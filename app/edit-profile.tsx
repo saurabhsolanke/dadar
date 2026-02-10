@@ -23,7 +23,7 @@ import { Modal } from 'react-native';
 export default function EditProfileScreen() {
     const router = useRouter();
     const { user, loading } = useAuth();
-    
+
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
@@ -34,7 +34,7 @@ export default function EditProfileScreen() {
     useEffect(() => {
         if (user) {
             setName(user.displayName || '');
-            setPhone(user.phoneNumber || ''); 
+            setPhone(user.phoneNumber || '');
             setEmail(user.email || '');
             setImage(user.photoURL);
         }
@@ -82,35 +82,35 @@ export default function EditProfileScreen() {
                 displayName: name,
                 photoURL: photoURL
             });
-            
+
             if (email !== user.email && email) {
                 try {
                     await updateEmail(user, email);
                 } catch (e: any) {
-                     Alert.alert("Error updating email", e.message);
+                    Alert.alert("Error updating email", e.message);
                 }
             }
 
             Alert.alert("Success", "Profile updated successfully!");
             router.back();
         } catch (error: any) {
-             Alert.alert("Error", error.message);
+            Alert.alert("Error", error.message);
         } finally {
             setSaving(false);
         }
     };
 
     if (loading) {
-         return (
-             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
                 <ActivityIndicator size="large" color="#FFD700" />
             </View>
         );
     }
 
-     if (!user) {
-         return (
-             <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+    if (!user) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
                 <Text>Please login to edit your profile.</Text>
             </View>
         );
@@ -119,7 +119,7 @@ export default function EditProfileScreen() {
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Stack.Screen options={{ headerShown: false }} />
-            
+
             {/* Header Background */}
             <View style={styles.headerBackground}>
                 <View style={styles.headerContent}>
@@ -136,9 +136,9 @@ export default function EditProfileScreen() {
                 {/* Avatar Section */}
                 <View style={styles.avatarContainer}>
                     <TouchableOpacity onPress={() => setShowAvatarModal(true)} style={styles.avatarWrapper}>
-                        <Image 
-                            source={{ uri: image || 'https://via.placeholder.com/150' }} 
-                            style={styles.avatar} 
+                        <Image
+                            source={{ uri: image || '' }}
+                            style={styles.avatar}
                         />
                         <View style={styles.cameraIcon}>
                             <Ionicons name="camera" size={20} color="white" />
@@ -156,7 +156,7 @@ export default function EditProfileScreen() {
                     transparent={true}
                     onRequestClose={() => setShowAvatarModal(false)}
                 >
-                     <View style={styles.modalOverlay}>
+                    <View style={styles.modalOverlay}>
                         <View style={styles.modalContent}>
                             <View style={styles.modalHeader}>
                                 <Text style={styles.modalTitle}>Choose Avatar</Text>
@@ -164,17 +164,17 @@ export default function EditProfileScreen() {
                                     <Ionicons name="close" size={24} color="black" />
                                 </TouchableOpacity>
                             </View>
-                            
+
                             <ScrollView contentContainerStyle={styles.avatarGrid}>
                                 {AVATARS.map((avatarUrl, index) => (
-                                    <TouchableOpacity 
-                                        key={index} 
+                                    <TouchableOpacity
+                                        key={index}
                                         onPress={() => {
                                             setImage(avatarUrl);
                                             setShowAvatarModal(false);
                                         }}
                                         style={[
-                                            styles.gridAvatarItem, 
+                                            styles.gridAvatarItem,
                                             image === avatarUrl && styles.selectedAvatar
                                         ]}
                                     >
@@ -182,7 +182,7 @@ export default function EditProfileScreen() {
                                     </TouchableOpacity>
                                 ))}
                                 {/* Option to pick from gallery */}
-                                <TouchableOpacity 
+                                <TouchableOpacity
                                     onPress={() => {
                                         pickImage();
                                         setShowAvatarModal(false);
@@ -190,8 +190,8 @@ export default function EditProfileScreen() {
                                     style={styles.gridAvatarItem}
                                 >
                                     <View style={[styles.gridAvatarImage, { backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }]}>
-                                         <Ionicons name="image" size={30} color="#666" />
-                                         <Text style={{fontSize: 10, color: '#666'}}>Gallery</Text>
+                                        <Ionicons name="image" size={30} color="#666" />
+                                        <Text style={{ fontSize: 10, color: '#666' }}>Gallery</Text>
                                     </View>
                                 </TouchableOpacity>
                             </ScrollView>
@@ -207,8 +207,8 @@ export default function EditProfileScreen() {
                 {/* Form Fields */}
                 <View style={styles.form}>
                     <View style={styles.inputContainer}>
-                        <TextInput 
-                            style={styles.input} 
+                        <TextInput
+                            style={styles.input}
                             value={name}
                             onChangeText={setName}
                             placeholder="Name"
@@ -217,20 +217,20 @@ export default function EditProfileScreen() {
                     </View>
 
                     <View style={styles.inputContainer}>
-                        <TextInput 
-                            style={styles.input} 
+                        <TextInput
+                            style={styles.input}
                             value={phone}
                             onChangeText={setPhone}
                             placeholder="Phone (Read only)"
                             keyboardType="phone-pad"
-                            editable={false} 
+                            editable={false}
                         />
                         <Ionicons name="lock-closed-outline" size={20} color="gray" />
                     </View>
 
                     <View style={styles.inputContainer}>
-                        <TextInput 
-                            style={styles.input} 
+                        <TextInput
+                            style={styles.input}
                             value={email}
                             onChangeText={setEmail}
                             placeholder="Email"
@@ -243,7 +243,7 @@ export default function EditProfileScreen() {
                 {/* Continue Button */}
                 <TouchableOpacity style={styles.button} onPress={handleSave} disabled={saving}>
                     {saving ? (
-                         <ActivityIndicator color="black" />
+                        <ActivityIndicator color="black" />
                     ) : (
                         <Text style={styles.buttonText}>Continue</Text>
                     )}

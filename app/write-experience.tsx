@@ -4,7 +4,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { Stack, useRouter } from 'expo-router';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { db } from '../src/config/firebase';
 import { useAuth } from '../src/hooks/useAuth';
 
@@ -32,12 +33,20 @@ export default function WriteExperienceScreen() {
 
     const handleSubmit = async () => {
         if (!title.trim() || !content.trim()) {
-            Alert.alert("Error", "Please fill in title and content");
+            Toast.show({
+                type: 'error',
+                text1: 'Missing Fields',
+                text2: 'Please fill in both title and content.',
+            });
             return;
         }
 
         if (!user) {
-            Alert.alert("Error", "You must be logged in to post");
+            Toast.show({
+                type: 'error',
+                text1: 'Authentication Required',
+                text2: 'You must be logged in to post.',
+            });
             return;
         }
 
@@ -58,11 +67,20 @@ export default function WriteExperienceScreen() {
                 createdAt: serverTimestamp(),
             });
 
-            Alert.alert("Success", "Your experience has been published!");
-            router.back();
+            Toast.show({
+                type: 'success',
+                text1: 'Success!',
+                text2: 'Your experience has been published.',
+            });
+            
+            router.push('/dadar');
         } catch (error: any) {
             console.error("Error posting experience:", error);
-            Alert.alert("Error", "Failed to post experience. Please try again.");
+            Toast.show({
+                type: 'error',
+                text1: 'Submission Failed',
+                text2: 'Failed to post experience. Please try again.',
+            });
         } finally {
             setSubmitting(false);
         }

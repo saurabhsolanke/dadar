@@ -1,8 +1,9 @@
 import ExperienceCard from '@/src/components/ExperienceCard';
+import SkeletonLoader from '@/src/components/SkeletonLoader';
 import { db } from '@/src/config/firebase'; // Ensure alias or relative path works
 import FontAwesome from '@expo/vector-icons/FontAwesome'; // Use FontAwesome
 import { useRouter } from 'expo-router';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -24,24 +25,26 @@ export default function Dadar() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const q = query(collection(db, 'experience'));
+                const q = query(collection(db, 'experience'), orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
 
                 const fetchedData: NewsItem[] = [];
 
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                     // Normalize image data
-                    const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-                    
-                    fetchedData.push({
-                        id: doc.id,
-                        title: data.title || 'Untitled',
-                        description: data.description || '',
-                        image: { uri: imageUrl },
-                        type: 'news', // Kept generic for card, but data is experience
-                        author: data.author || 'Anonymous',
-                    });
+                    if (data.isApproved) {
+                        // Normalize image data
+                        const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+
+                        fetchedData.push({
+                            id: doc.id,
+                            title: data.title || 'Untitled',
+                            description: data.description || '',
+                            image: { uri: imageUrl },
+                            type: 'news', // Kept generic for card, but data is experience
+                            author: data.author || 'Anonymous',
+                        });
+                    }
                 });
 
                 setNews(fetchedData);
@@ -59,37 +62,59 @@ export default function Dadar() {
     const handlePress = (id: string, title: string) => {
         // Experience details page could be different, but using news detail for now or just generic
         router.push({
-             pathname: '/experience/[id]', 
-             params: { id, title }
+            pathname: '/experience/[id]',
+            params: { id, title }
         });
     };
 
     return (
         <View style={styles.container}>
             {/* Header handled in _layout.tsx */}
+            <View style={styles.tabContainer}>
+                <TouchableOpacity style={styles.tab} onPress={() => router.push('/news-feed')}>
+                      <FontAwesome name="newspaper-o" size={14} color="black" style={{ marginRight: 2 }} />
+                    <Text style={styles.tabText}>News</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{paddingVertical: 12,  gap: 8,}} onPress={() => router.push('/write-experience')}>
+                    <Text style={styles.tabText }> <FontAwesome name="pencil" size={14} color="black" style={{ marginRight: 2 }} /> Write Experience</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.tab} onPress={() => router.push('/map')}>
+                    <FontAwesome name="map-marker" size={14} color="black" style={{ marginRight: 2 }} />
+                    <Text style={styles.tabText}>Map</Text> 
+                </TouchableOpacity>
+            </View>
 
-            <View style={styles.subHeader}>
+
+            {/* <View style={styles.subHeader}>
                 <View style={styles.subHeaderLeft}>
-                    <TouchableOpacity onPress={() => router.push('/news-feed')} style={{flexDirection: 'row', alignItems: 'center'}}>
-                         <FontAwesome name="newspaper-o" size={14} color="black" style={{marginRight: 8}}/>
-                         <Text style={styles.subHeaderTitle}>Read News & Blogs</Text>
+                    <TouchableOpacity onPress={() => router.push('/news-feed')} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <FontAwesome name="newspaper-o" size={14} color="black" style={{ marginRight: 8 }} />
+                        <Text style={styles.subHeaderTitle}>Read News & Blogs</Text>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.writeButton} onPress={() => router.push('/write-experience')}>
                     <Text style={styles.writeButtonText}>Write Your Experience</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
 
             {loading ? (
-                <View style={styles.center}>
-                    <ActivityIndicator size="large" color="#FFD700" />
+                <View style={styles.listContent}>
+                  <View style={styles.row}>
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <View key={i} style={{ width: '48%', marginBottom: 15 }}>
+                        <SkeletonLoader height={200} borderRadius={12} style={{ marginBottom: 8 }} />
+                        <SkeletonLoader height={16} width="80%" borderRadius={4} style={{ marginBottom: 4 }} />
+                        <SkeletonLoader height={14} width="60%" borderRadius={4} />
+                      </View>
+                    ))}
+                  </View>
                 </View>
             ) : (
                 <FlatList
                     data={news}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                         <ExperienceCard
+                        <ExperienceCard
                             image={item.image}
                             title={item.title}
                             content={item.description}
@@ -152,5 +177,34 @@ const styles = StyleSheet.create({
     row: {
         justifyContent: 'space-between',
         gap: 12,
+    },
+
+    tabContainer: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        backgroundColor: '#fff',
+    },
+    tab: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        gap: 8,
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+    },
+    activeTab: {
+        borderBottomColor: '#FFD700',
+    },
+    tabText: {
+        fontSize: 16,
+        color: '#888',
+        fontWeight: '500',
+    },
+    activeTabText: {
+        color: 'black',
+        fontWeight: 'bold',
     },
 });

@@ -48,10 +48,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="places"
+        name="hotels"
         options={{
-          title: 'Places',
-          tabBarIcon: ({ color }) => <TabBarIcon name="building" color={color} />,
+          title: 'Hotels',
+          tabBarIcon: ({ color }) => <TabBarIcon name="hotel" color={color} />,
         }}
       />
 
@@ -61,8 +61,8 @@ export default function TabLayout() {
         options={{
           headerTitle: 'Dadar',
           headerTitleStyle: {
-              fontSize: 18,
-              fontWeight: 'bold',
+            fontSize: 18,
+            fontWeight: 'bold',
           },
           headerShadowVisible: false,
           headerLeft: () => <AppHeaderLeft />,
@@ -72,12 +72,11 @@ export default function TabLayout() {
           tabBarButton: (props) => <DadarTabButton {...props} />,
         }}
       />
-
-      <Tabs.Screen
-        name="shopping"
+     <Tabs.Screen
+        name="places"
         options={{
-          title: 'Shopping',
-          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
+          title: 'Places',
+          tabBarIcon: ({ color }) => <TabBarIcon name="building" color={color} />,
         }}
       />
       <Tabs.Screen

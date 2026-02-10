@@ -47,7 +47,7 @@ export default function SearchScreen() {
 
             // NOTE: For Production, use Algolia or specialized search. 
             // For MVP, fetching smaller datasets and filtering client-side acts as a robust partial match search.
-            
+
             const collectionsToSearch = [
                 { name: 'hotels', type: 'hotel', titleField: 'title' },
                 { name: 'shops', type: 'shop', titleField: 'name' }, // Note: shops use 'name'
@@ -64,14 +64,14 @@ export default function SearchScreen() {
                     const title = data[col.titleField] || data.title || 'Untitled';
                     // Simple client-side containment check
                     if (title.toLowerCase().includes(lowerText)) {
-                         const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || 'https://via.placeholder.com/150';
-                         return {
-                             id: doc.id,
-                             title: title,
-                             description: data.description || data.summary || data.location || '',
-                             image: { uri: imageUrl },
-                             type: col.type as any
-                         };
+                        const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
+                        return {
+                            id: doc.id,
+                            title: title,
+                            description: data.description || data.summary || data.location || '',
+                            image: { uri: imageUrl },
+                            type: col.type as any
+                        };
                     }
                     return null;
                 }).filter(item => item !== null) as SearchResult[];
@@ -125,7 +125,7 @@ export default function SearchScreen() {
     );
 
     const getBadgeColor = (type: string) => {
-        switch(type) {
+        switch (type) {
             case 'hotel': return '#e3f2fd'; // Blue
             case 'shop': return '#e8f5e9'; // Green
             case 'place': return '#f3e5f5'; // Purple
@@ -137,21 +137,21 @@ export default function SearchScreen() {
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
-            
+
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="black" />
                 </TouchableOpacity>
                 <View style={styles.searchBar}>
-                     <Ionicons name="search" size={20} color="#666" style={{marginRight: 8}} />
-                     <TextInput
+                    <Ionicons name="search" size={20} color="#666" style={{ marginRight: 8 }} />
+                    <TextInput
                         style={styles.input}
                         value={queryText}
                         onChangeText={setQueryText}
                         onSubmitEditing={handleSearchSubmit}
                         placeholder="Search Hotel, Places, Events..."
                         autoFocus={!q} // Auto focus if no query passed initially
-                     />
+                    />
                 </View>
             </View>
 
@@ -169,7 +169,7 @@ export default function SearchScreen() {
                     keyboardShouldPersistTaps="handled"
                     ListEmptyComponent={
                         <View style={styles.center}>
-                             {queryText ? <Text style={{color: '#666'}}>No results found for "{queryText}"</Text> : <Text style={{color: '#666'}}>Start searching...</Text>}
+                            {queryText ? <Text style={{ color: '#666' }}>No results found for "{queryText}"</Text> : <Text style={{ color: '#666' }}>Start searching...</Text>}
                         </View>
                     }
                 />
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
-        backgroundColor: '#fff', 
+        backgroundColor: '#fff',
     },
     backButton: {
         marginRight: 10,
