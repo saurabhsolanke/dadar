@@ -1,54 +1,28 @@
-import React, { useState } from 'react';
-import { Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/src/context/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BannerItem, subscribeToBanners } from '../services/banners';
 
 const { width } = Dimensions.get('window');
 
-interface BannerItem {
-    id: string;
-    title: string;
-    subtitle: string;
-    location: string;
-    date: string;
-    image: string;
-    link?: string;
-}
-
-const DUMMY_BANNERS: BannerItem[] = [
-    {
-        id: '1',
-        title: 'Dadar Walkathon',
-        subtitle: 'Step for Health!',
-        location: '📍 Shivaji Park, Dadar (West)',
-        date: 'Sun, 3rd Aug | 6:30 AM Onwards',
-        image: 'https://images.unsplash.com/photo-1533227297464-90aa2286786a?fit=crop&w=800&q=80',
-    },
-    {
-        id: '2',
-        title: 'Mumbai Food Fest',
-        subtitle: 'Taste of Dadar',
-        location: '📍 Dadar Chowpatty',
-        date: 'Fri, 15th Aug | 5:00 PM Onwards',
-        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?fit=crop&w=800&q=80',
-    },
-    {
-        id: '3',
-        title: 'Cultural Night',
-        subtitle: 'Music & Dance',
-        location: '📍 Plaza Theatre',
-        date: 'Sat, 20th Sep | 7:00 PM',
-        image: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?fit=crop&w=800&q=80',
-    }
-];
-
-import { useTheme } from '@/src/context/ThemeContext';
-
 export default function BannerCarousel() {
+    const [banners, setBanners] = useState<BannerItem[]>([]);
+    const [loading, setLoading] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
+    useEffect(() => {
+        const unsubscribe = subscribeToBanners((data) => {
+            setBanners(data);
+            setLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
+
     const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const slideSize = event.nativeEvent.layoutMeasurement.width;
+        if (slideSize === 0) return;
         const index = event.nativeEvent.contentOffset.x / slideSize;
         const roundIndex = Math.round(index);
         setActiveIndex(roundIndex);
@@ -60,6 +34,16 @@ export default function BannerCarousel() {
         paginationDotInactive: { backgroundColor: isDark ? '#444' : '#ccc' },
     };
 
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.center]}>
+                <ActivityIndicator size="small" color="#FFD700" />
+            </View>
+        );
+    }
+
+    if (banners.length === 0) return null;
+
     return (
         <View style={styles.container}>
             <ScrollView
@@ -70,7 +54,7 @@ export default function BannerCarousel() {
                 scrollEventThrottle={16}
                 contentContainerStyle={styles.scrollContent}
             >
-                {DUMMY_BANNERS.map((item) => (
+                {banners.map((item) => (
                     <TouchableOpacity key={item.id} activeOpacity={0.9} style={styles.bannerContainer}>
                         <Image
                             source={{ uri: item.image }}
@@ -94,7 +78,7 @@ export default function BannerCarousel() {
 
             {/* Pagination Dots */}
             <View style={styles.paginationContainer}>
-                {DUMMY_BANNERS.map((_, index) => (
+                {banners.map((_, index) => (
                     <View
                         key={index}
                         style={[
@@ -111,6 +95,11 @@ export default function BannerCarousel() {
 const styles = StyleSheet.create({
     container: {
         marginBottom: 20,
+    },
+    center: {
+        height: 180,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollContent: {
         // paddingHorizontal: 20, // Removing horizontal padding to allow full width swipe, but bannerContainer has margin

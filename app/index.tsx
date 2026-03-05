@@ -43,7 +43,7 @@ export default function SplashScreen() {
             <Animated.View style={[styles.logoContainer, animatedStyle]}>
                 {/* Using the existing splash-icon as the logo source for now */}
                 <Image
-                    source={require('../assets/images/splash-icon.png')}
+                    source={require('../assets/images/yellow-bglogo.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
@@ -55,7 +55,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFD700', // Dadar Yellow
+        backgroundColor: '#ffffffff', // Dadar Yellow
         alignItems: 'center',
         justifyContent: 'center',
     },

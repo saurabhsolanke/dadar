@@ -2,6 +2,13 @@
 
 # dependencies
 node_modules/
+.env
+PRICING_QUOTATION.md
+PRICING_SUMMARY.md
+PROJECT_DOCUMENTATION.md
+PROJECT_SUMMARY.md
+.gitignore
+.gitignore
 
 # Expo
 .expo/

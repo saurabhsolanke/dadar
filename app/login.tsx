@@ -1,6 +1,8 @@
 import { login } from '@/src/services/auth';
+import { handleFacebookSignIn, handleGoogleSignIn, handleInstagramSignIn, useFacebookAuth, useGoogleAuth, useInstagramAuth } from '@/src/services/sso';
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -9,6 +11,51 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    const [googleRequest, googleResponse, googlePromptAsync] = useGoogleAuth();
+    const [fbRequest, fbResponse, fbPromptAsync] = useFacebookAuth();
+    const [instaRequest, instaResponse, instaPromptAsync] = useInstagramAuth();
+
+    useEffect(() => {
+        if (googleResponse?.type === 'success') {
+            setLoading(true);
+            handleGoogleSignIn(googleResponse)
+                .then(() => {
+                    setLoading(false);
+                    router.replace('/(tabs)');
+                })
+                .catch((err) => {
+                    setLoading(false);
+                    Toast.show({ type: 'error', text1: 'Google Login Failed', text2: err.message });
+                });
+        }
+    }, [googleResponse]);
+
+    useEffect(() => {
+        if (fbResponse?.type === 'success') {
+            setLoading(true);
+            handleFacebookSignIn(fbResponse)
+                .then(() => {
+                    setLoading(false);
+                    router.replace('/(tabs)');
+                })
+                .catch((err) => {
+                    setLoading(false);
+                    Toast.show({ type: 'error', text1: 'Facebook Login Failed', text2: err.message });
+                });
+        }
+    }, [fbResponse]);
+
+    useEffect(() => {
+        if (instaResponse?.type === 'success') {
+            setLoading(true);
+            handleInstagramSignIn(instaResponse)
+                .catch((err) => {
+                    setLoading(false);
+                    Toast.show({ type: 'error', text1: 'Instagram Login Failed', text2: err.message });
+                });
+        }
+    }, [instaResponse]);
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -33,8 +80,6 @@ export default function LoginScreen() {
         } catch (error: any) {
             setLoading(false);
 
-            // Try to normalize Firebase error shape
-            // Some errors come as { error: { message: 'INVALID_LOGIN_CREDENTIALS', ... } }
             const rawMessage =
                 error?.error?.message ||
                 error?.message ||
@@ -61,6 +106,34 @@ export default function LoginScreen() {
         router.push('/signup');
     };
 
+    const isGoogleConfigured = !!process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
+    const isFacebookConfigured = !!process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
+    const isInstagramConfigured = !!process.env.EXPO_PUBLIC_INSTAGRAM_CLIENT_ID;
+
+    const handleGoogleLogin = () => {
+        if (!isGoogleConfigured) {
+            Toast.show({ type: 'error', text1: 'Configuration Missing', text2: 'Google Client ID is not set in .env' });
+            return;
+        }
+        googlePromptAsync();
+    };
+
+    const handleInstagramLogin = () => {
+        if (!isInstagramConfigured) {
+            Toast.show({ type: 'error', text1: 'Configuration Missing', text2: 'Instagram Client ID is not set in .env' });
+            return;
+        }
+        instaPromptAsync();
+    };
+
+    const handleFacebookLogin = () => {
+        if (!isFacebookConfigured) {
+            Toast.show({ type: 'error', text1: 'Configuration Missing', text2: 'Facebook App ID is not set in .env' });
+            return;
+        }
+        fbPromptAsync();
+    };
+
     return (
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
@@ -74,13 +147,11 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.formSection}>
-                <Text style={styles.header}>Welcome Back!</Text>
-                <Text style={styles.subHeader}>Sign in to continue</Text>
+                <Text style={styles.header}>Login to your account</Text>
 
-                <Text style={styles.inputLabel}>Email Address</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your email"
+                    placeholder="Enter you phone number or email id"
                     placeholderTextColor="#999"
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -88,24 +159,49 @@ export default function LoginScreen() {
                     onChangeText={setEmail}
                 />
 
-                <Text style={styles.inputLabel}>Password</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter your password"
+                    placeholder="Password"
                     placeholderTextColor="#999"
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
                 />
-                
-                {/* <Text style={styles.forgotPasswordText}>Forgot Password?</Text> */}
 
                 <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
-                    {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Log In</Text>}
+                    {loading ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>Continue</Text>}
                 </TouchableOpacity>
 
+                <View style={styles.dividerSection}>
+                    <Text style={styles.dividerText}>-Or Sign in with-</Text>
+                </View>
+
+                <View style={styles.ssoSection}>
+                    <TouchableOpacity 
+                        style={styles.ssoButton} 
+                        onPress={handleGoogleLogin}
+                        disabled={!googleRequest || loading}
+                    >
+                        <AntDesign name="google" size={24} color="#4285F4" />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.ssoButton} 
+                        onPress={handleInstagramLogin}
+                        disabled={!instaRequest || loading}
+                    >
+                        <AntDesign name="instagram" size={24} color="#E4405F" />
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.ssoButton} 
+                        onPress={handleFacebookLogin}
+                        disabled={!fbRequest || loading}
+                    >
+                        <FontAwesome name="facebook" size={24} color="#1877F2" />
+                    </TouchableOpacity>
+                </View>
+
                 <TouchableOpacity onPress={navigateToSignUp} style={styles.footerLink}>
-                    <Text style={styles.footerText}>Don't have an account? <Text style={styles.linkText}>Sign Up</Text></Text>
+                    <Text style={styles.footerText}>Don't have an account? <Text style={styles.linkText}>Sign up</Text></Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -118,57 +214,37 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     logoSection: {
-        flex: 0.4,
-        backgroundColor: '#fff', 
+        flex: 0.35,
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 50,
+        paddingTop: 40,
     },
     logo: {
-        width: 120,
-        height: 120,
+        width: 140,
+        height: 140,
     },
     formSection: {
-        flex: 0.6,
-        paddingHorizontal: 24,
-        paddingTop: 20,
+        flex: 0.65,
+        paddingHorizontal: 28,
     },
     header: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 8,
+        marginBottom: 25,
         color: '#000',
-    },
-    subHeader: {
-        fontSize: 16,
-        color: '#666',
-        marginBottom: 30,
-    },
-    inputLabel: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 8,
-        color: '#333',
+        textAlign: 'left',
     },
     input: {
         height: 55,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 30, 
+        borderWidth: 1.5,
+        borderColor: '#E8E8E8',
+        borderRadius: 30,
         paddingHorizontal: 20,
         fontSize: 16,
         marginBottom: 20,
-        backgroundColor: '#f9f9f9',
-    },
-    forgotPasswordText: {
-        textAlign: 'right',
-        color: '#666',
-        fontSize: 12,
-        marginBottom: 20,
-    },
-    linkText: {
-        color: '#007AFF', 
-        fontWeight: 'bold',
+        backgroundColor: '#F6F6F6',
+        color: '#000',
     },
     button: {
         backgroundColor: '#FFD700',
@@ -176,12 +252,7 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
+        marginBottom: 35,
         marginTop: 10,
     },
     buttonText: {
@@ -189,13 +260,46 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#000',
     },
+    dividerSection: {
+        alignItems: 'center',
+        marginBottom: 25,
+    },
+    dividerText: {
+        color: '#A1A1A1',
+        fontSize: 14,
+    },
+    ssoSection: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
+        marginBottom: 50,
+    },
+    ssoButton: {
+        width: 65,
+        height: 60,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Shadow for iOS
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        // Elevation for Android
+        elevation: 2,
+    },
     footerLink: {
         alignItems: 'center',
         marginTop: 10,
     },
     footerText: {
         fontSize: 14,
-        color: '#666',
+        color: '#A1A1A1',
+    },
+    linkText: {
+        color: '#3B82F6',
+        fontWeight: 'bold',
     },
 });
 

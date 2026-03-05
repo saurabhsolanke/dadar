@@ -13,7 +13,7 @@ interface HistoryCardProps {
 
 import { useTheme } from '@/src/context/ThemeContext';
 
-export default function HistoryCard({ title, description, est, image, onPress, width = 200 }: HistoryCardProps) {
+export default function HistoryCard({ title, description, est, image, onPress, width = 200, height = 250 }: HistoryCardProps & { height?: number }) {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
@@ -34,15 +34,14 @@ export default function HistoryCard({ title, description, est, image, onPress, w
     };
 
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }, dynamicStyles.card]}>
-            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
+        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width, height }, dynamicStyles.card]}>
+            <View style={[styles.imageContainer, { height: height - 80 }, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
             <View style={styles.contentContainer}>
                 <Text style={[styles.title, dynamicStyles.title]} numberOfLines={1}>{title}</Text>
-                <Text style={[styles.description, dynamicStyles.description]} numberOfLines={2}>{description}</Text>
                 <View style={styles.footer}>
-                    <Ionicons name="time" size={14} color="#007AFF" />
+                    <Ionicons name="time" size={12} color="#007AFF" />
                     <Text style={styles.estText}>{est}</Text>
                 </View>
             </View>
@@ -53,18 +52,18 @@ export default function HistoryCard({ title, description, est, image, onPress, w
 const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
-        borderRadius: 16,
+        borderRadius: 12,
         marginRight: 16,
         marginBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 4,
+        shadowRadius: 4,
+        elevation: 3,
         overflow: 'hidden',
     },
     imageContainer: {
-        height: 150,
+        width: '100%',
         backgroundColor: '#f0f0f0',
     },
     image: {
@@ -72,28 +71,23 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     contentContainer: {
-        padding: 16,
+        padding: 12,
+        justifyContent: 'center',
     },
     title: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#000',
-        marginBottom: 4,
-    },
-    description: {
-        fontSize: 14,
-        color: '#666',
-        marginBottom: 12,
-        lineHeight: 20,
+        marginBottom: 2,
     },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
     },
     estText: {
-        fontSize: 14,
-        color: '#007AFF', // Blue color for the date
+        fontSize: 12,
+        color: '#007AFF',
         fontWeight: '600',
     },
 });

@@ -1,18 +1,32 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const COLUMN_GAP = 12;
+const CONTAINER_PADDING = 16;
+const DEFAULT_CARD_WIDTH = (SCREEN_WIDTH - (CONTAINER_PADDING * 2) - COLUMN_GAP) / 2;
 
 interface NewsCardProps {
     title: string;
-    content: string;
+    content: string; // Used as subtitle/author area like distance
     image: any;
-    author?: string; // Added author prop
+    author?: string;
     onPress?: () => void;
     width?: number;
+    height?: number;
 }
 
 import { useTheme } from '@/src/context/ThemeContext';
 
-export default function NewsCard({ title, content, image, author, onPress, width = 200 }: NewsCardProps) {
+export default function NewsCard({ 
+    title, 
+    content, 
+    image, 
+    author, 
+    onPress, 
+    width = DEFAULT_CARD_WIDTH, 
+    height = 250 
+}: NewsCardProps) {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
@@ -34,14 +48,13 @@ export default function NewsCard({ title, content, image, author, onPress, width
     };
 
     return (
-        <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { width }, dynamicStyles.card]}>
-            <View style={[styles.imageContainer, dynamicStyles.imageBg]}>
+        <TouchableOpacity activeOpacity={0.8} onPress={onPress} style={[styles.card, { width, height }, dynamicStyles.card]}>
+            <View style={[styles.imageContainer, { height: height - 80 }, dynamicStyles.imageBg]}>
                 <Image source={source} style={styles.image} resizeMode="cover" />
             </View>
-            <View style={styles.contentContainer}>
-                 {author && <Text style={[styles.author, dynamicStyles.author]}>{author}</Text>}
-                <Text style={[styles.headline, dynamicStyles.headline]} numberOfLines={2}>{title}</Text>
-                <Text style={[styles.summary, dynamicStyles.summary]} numberOfLines={3}>{content}</Text>
+            <View style={styles.infoContainer}>
+                {author && <Text style={[styles.author, dynamicStyles.author]} numberOfLines={1}>{author}</Text>}
+                <Text style={[styles.headline, dynamicStyles.headline]} numberOfLines={1}>{title}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -52,40 +65,35 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 12,
         marginBottom: 16,
-        marginRight: 16,
+        // Shadow
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
         overflow: 'hidden',
+        marginRight: 15,
     },
     imageContainer: {
-        height: 140, // Slightly reduced height
+        width: '100%',
         backgroundColor: '#f0f0f0',
     },
     image: {
         width: '100%',
         height: '100%',
     },
-    contentContainer: {
+    infoContainer: {
         padding: 12,
+        justifyContent: 'center',
     },
     author: {
         fontSize: 12,
         color: '#888',
-        marginBottom: 4,
+        marginBottom: 2,
     },
     headline: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#000',
-        marginBottom: 6,
-        lineHeight: 22,
-    },
-    summary: {
-        fontSize: 12,
-        color: '#666',
-        lineHeight: 18,
     },
 });

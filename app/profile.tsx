@@ -26,7 +26,7 @@ export default function ProfileScreen() {
                 type: 'success',
                 text1: 'Logged out successfully',
             });
-            router.replace('/'); // Redirect to home or login page after logout
+            router.replace('/login'); // Redirect to home or login page after logout
         } catch (error: any) {
             console.error("Logout failed", error);
             Toast.show({

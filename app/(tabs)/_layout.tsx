@@ -1,11 +1,11 @@
+
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { AppHeaderLeft } from '@/src/components/AppHeaderLeft';
 import { AppHeaderRight } from '@/src/components/AppHeaderRight';
-import { DadarTabButton } from '@/src/components/DadarTabButton';
+import { DadarTabButton } from '@/src/components/DadarTabButton'; // Commented out as the custom button is not currently used
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -62,8 +62,19 @@ export default function TabLayout() {
         }}
       />
 
+       <Tabs.Screen
+        name="dadar"
+        options={{
+          headerTitle: 'Dadar',
+          headerShadowVisible: false,
+          title: '',
+          tabBarIcon: () => null, // Hide default icon
+          tabBarButton: (props) => <DadarTabButton {...props} />,
+        }}
+      /> 
+
       {/* Center Custom Button */}
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="dadar"
         options={{
           headerTitle: 'Dadar',
@@ -79,7 +90,8 @@ export default function TabLayout() {
           tabBarIcon: () => null, // Hide default icon
           tabBarButton: (props) => <DadarTabButton {...props} />,
         }}
-      />
+      /> */}
+
      <Tabs.Screen
         name="places"
         options={{

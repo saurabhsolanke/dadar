@@ -1,16 +1,14 @@
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
 import { FirebaseApp, getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth, initializeAuth } from "firebase/auth";
-import { Platform } from 'react-native';
+import { Auth, getAuth, initializeAuth } from "firebase/auth";
 // @ts-ignore
-
 import { getReactNativePersistence } from 'firebase/auth';
-
+import { Platform } from 'react-native';
 
 // TODO: Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
- apiKey: "AIzaSyAW-s9eHBf-c9fOZfql-j3MRYeF1FlEo-I",
+  apiKey: "AIzaSyAW-s9eHBf-c9fOZfql-j3MRYeF1FlEo-I",
   authDomain: "dadar-c2456.firebaseapp.com",
   projectId: "dadar-c2456",
   storageBucket: "dadar-c2456.firebasestorage.app",
@@ -21,8 +19,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let app: FirebaseApp;
-let auth;
-let analytics;
+let auth: Auth;
+let analytics: Analytics | undefined;
 
 if (getApps().length === 0) {
   app = initializeApp(firebaseConfig);
@@ -45,7 +43,6 @@ isSupported().then((supported) => {
     analytics = getAnalytics(app);
   }
 });
-
 
 // Initialize Firestore
 import { getFirestore } from "firebase/firestore";

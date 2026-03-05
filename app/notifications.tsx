@@ -1,44 +1,25 @@
+import { useTheme } from '@/src/context/ThemeContext';
+import { Notification, subscribeToNotifications } from '@/src/services/notifications';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
-
-// Mock Data
-const NOTIFICATIONS = [
-    {
-        id: '1',
-        title: 'Welcome to Dadar!',
-        message: 'Explore the best places, events, and shops in Dadar.',
-        time: '2h ago',
-        read: false,
-    },
-    {
-        id: '2',
-        title: 'New Event: Shivaji Park Ledger',
-        message: 'Join us for a community meetup this Sunday at Shivaji Park.',
-        time: '5h ago',
-        read: true,
-    },
-    {
-        id: '3',
-        title: 'Shopping Sale Started',
-        message: 'Get up to 50% off at Star Mall Dadar. Limited time offer.',
-        time: '1d ago',
-        read: true,
-    },
-    {
-        id: '4',
-        title: 'Flower Market Update',
-        message: 'Fresh stock arrived at the Dadar Flower Market. Check it out!',
-        time: '2d ago',
-        read: true,
-    },
-];
-
-import { useTheme } from '@/src/context/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 
 export default function NotificationsScreen() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
+    
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = subscribeToNotifications((data) => {
+            setNotifications(data);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     const dynamicStyles = {
         container: { backgroundColor: isDark ? '#000' : '#fff' },
@@ -53,38 +34,53 @@ export default function NotificationsScreen() {
         iconContainer: { backgroundColor: isDark ? '#333' : '#FFF9C4' },
     };
 
+    if (loading) {
+        return (
+            <View style={[styles.container, dynamicStyles.container, styles.centered]}>
+                <ActivityIndicator size="large" color="#FFD700" />
+            </View>
+        );
+    }
+
     return (
         <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen
                 options={{
                     headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
                     headerTintColor: isDark ? '#fff' : '#000',
+                    title: 'Notifications',
                 }}
             />
-            <FlatList
-                data={NOTIFICATIONS}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={[
-                        styles.notificationItem, 
-                        dynamicStyles.item, 
-                        !item.read && [styles.unreadItem, dynamicStyles.unreadItem]
-                    ]}>
-                        <View style={[styles.iconContainer, dynamicStyles.iconContainer]}>
-                            <Text style={styles.iconText}>🔔</Text>
-                        </View>
-                        <View style={styles.contentContainer}>
-                            <View style={styles.headerRow}>
-                                <Text style={[styles.title, dynamicStyles.title]}>{item.title}</Text>
-                                <Text style={[styles.time, dynamicStyles.time]}>{item.time}</Text>
+            {notifications.length === 0 ? (
+                <View style={[styles.container, dynamicStyles.container, styles.centered]}>
+                    <Text style={[styles.message, dynamicStyles.message]}>No notifications yet.</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={notifications}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <View style={[
+                            styles.notificationItem, 
+                            dynamicStyles.item, 
+                            !item.read && [styles.unreadItem, dynamicStyles.unreadItem]
+                        ]}>
+                            <View style={[styles.iconContainer, dynamicStyles.iconContainer]}>
+                                <Text style={styles.iconText}>🔔</Text>
                             </View>
-                            <Text style={[styles.message, dynamicStyles.message]} numberOfLines={2}>{item.message}</Text>
+                            <View style={styles.contentContainer}>
+                                <View style={styles.headerRow}>
+                                    <Text style={[styles.title, dynamicStyles.title]}>{item.title}</Text>
+                                    <Text style={[styles.time, dynamicStyles.time]}>{item.time}</Text>
+                                </View>
+                                <Text style={[styles.message, dynamicStyles.message]} numberOfLines={2}>{item.message}</Text>
+                            </View>
+                            {!item.read && <View style={styles.dot} />}
                         </View>
-                        {!item.read && <View style={styles.dot} />}
-                    </View>
-                )}
-                contentContainerStyle={styles.listContent}
-            />
+                    )}
+                    contentContainerStyle={styles.listContent}
+                />
+            )}
             <StatusBar style={isDark ? "light" : "dark"} />
         </View>
     );
@@ -94,6 +90,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    centered: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     listContent: {
         padding: 16,

@@ -13,15 +13,15 @@ export const DadarTabButton = (props: any) => {
                 props.onPress?.(e);
             }}
             style={{
-                top: -30,
+                top: -7,
                 justifyContent: 'center',
                 alignItems: 'center',
             }}
         >
             <View style={{
-                width: 70,
-                height: 70,
-                borderRadius: 35,
+                width: 60,
+                height: 60,
+                borderRadius: 30,
                 backgroundColor: '#FFD700', // Yellow Circle
                 justifyContent: 'center',
                 alignItems: 'center',

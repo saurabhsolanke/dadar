@@ -248,10 +248,10 @@ export default function HomeScreen() {
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-          <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+          <View style={{ flexDirection: 'row', gap: 15 }}>
             {[1, 2, 3].map((i) => (
               <View key={i} style={{ width: 200, marginRight: 15 }}>
-                <SkeletonLoader height={120} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
                 <SkeletonLoader height={20} width="80%" borderRadius={4} style={{ marginBottom: 4 }} />
                 <SkeletonLoader height={16} width="60%" borderRadius={4} />
               </View>
@@ -262,6 +262,8 @@ export default function HomeScreen() {
             <HotelCard
               key={item.id}
               {...item}
+              width={200}
+              height={250}
               onPress={() => navigateToHotel(item.id, item.title)}
             />
           ))
@@ -277,10 +279,10 @@ export default function HomeScreen() {
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-           <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+           <View style={{ flexDirection: 'row', gap: 15 }}>
             {[1, 2, 3].map((i) => (
               <View key={i} style={{ width: 200, marginRight: 15 }}>
-                <SkeletonLoader height={120} borderRadius={12} style={{ marginBottom: 8 }} />
+                <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
                 <SkeletonLoader height={20} width="70%" borderRadius={4} style={{ marginBottom: 4 }} />
                 <SkeletonLoader height={16} width="50%" borderRadius={4} />
               </View>
@@ -291,6 +293,8 @@ export default function HomeScreen() {
             <HotelCard
               key={item.id}
               {...item}
+              width={200}
+              height={250}
               onPress={() => navigateToShop(item.id, item.title)}
             />
           ))
@@ -305,43 +309,33 @@ export default function HomeScreen() {
       </View>
       <View>
          {loading ? (
-             <View style={{ paddingLeft: 20 }}>
-                 <SkeletonLoader height={200} width={viewportWidth - 40} borderRadius={12} />
+             <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+                {[1, 2, 3].map((i) => (
+                    <View key={i} style={{ width: 200, marginRight: 15 }}>
+                        <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
+                        <SkeletonLoader height={20} width="80%" borderRadius={4} style={{ marginBottom: 4 }} />
+                        <SkeletonLoader height={16} width="60%" borderRadius={4} />
+                    </View>
+                ))}
              </View>
          ) : (
-             <>
-                <ScrollView
+            <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                onScroll={handleEventScroll}
-                scrollEventThrottle={16}
                 contentContainerStyle={styles.listContainer}
-                >
+            >
                 {events.map((event, index) => (
                     <EventCard
                     key={index}
                     title={event.title}
                     description={event.description}
                     image={event.image}
-                    width={viewportWidth - 40}
-                    onPress={() => navigateToEvent(event.id, event.title)} // Full width minus margins
+                    width={200}
+                    height={250}
+                    onPress={() => navigateToEvent(event.id, event.title)}
                     />
                 ))}
-                </ScrollView>
-                {/* Pagination Dots */}
-                <View style={styles.paginationContainer}>
-                {events.map((_, index) => (
-                    <View
-                    key={index}
-                    style={[
-                        styles.paginationDot,
-                        activeEventIndex === index ? styles.paginationDotActive : dynamicStyles.paginationDotInactive
-                    ]}
-                    />
-                ))}
-                </View>
-            </>
+            </ScrollView>
          )}
       </View>
 
@@ -354,10 +348,10 @@ export default function HomeScreen() {
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-             <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+             <View style={{ flexDirection: 'row', gap: 15 }}>
             {[1, 2, 3].map((i) => (
-              <View key={i} style={{ width: 180, marginRight: 15 }}>
-                <SkeletonLoader height={140} borderRadius={12} style={{ marginBottom: 8 }} />
+              <View key={i} style={{ width: 200, marginRight: 15 }}>
+                <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
                 <SkeletonLoader height={18} width="90%" borderRadius={4} />
               </View>
             ))}
@@ -370,6 +364,8 @@ export default function HomeScreen() {
               description={item.description}
               est={item.est}
               image={item.image}
+              width={200}
+              height={250}
               onPress={() => navigateToPlaces(item.id, item.title)}
             />
           ))
@@ -385,10 +381,10 @@ export default function HomeScreen() {
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listContainer}>
         {loading ? (
-            <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
+            <View style={{ flexDirection: 'row', gap: 15 }}>
             {[1, 2, 3].map((i) => (
-              <View key={i} style={{ width: 250, marginRight: 15 }}>
-                <SkeletonLoader height={150} borderRadius={12} style={{ marginBottom: 8 }} />
+              <View key={i} style={{ width: 200, marginRight: 15 }}>
+                <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
                 <SkeletonLoader height={20} width="95%" borderRadius={4} style={{ marginBottom: 4 }} />
                 <SkeletonLoader height={16} width="100%" borderRadius={4} />
               </View>
@@ -401,6 +397,8 @@ export default function HomeScreen() {
               title={item.title}
               content={item.content}
               image={item.image}
+              width={200}
+              height={250}
               onPress={() => navigateToNews(item.id, item.title)}
             />
           ))
