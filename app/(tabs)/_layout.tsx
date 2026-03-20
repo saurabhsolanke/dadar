@@ -59,6 +59,7 @@ export default function TabLayout() {
         options={{
           title: 'Hotels',
           tabBarIcon: ({ color }) => <TabBarIcon name="hotel" color={color} />,
+          headerRight: () => <AppHeaderRight />,
         }}
       />
 
@@ -67,8 +68,9 @@ export default function TabLayout() {
         options={{
           headerTitle: 'Dadar',
           headerShadowVisible: false,
+          headerRight: () => <AppHeaderRight />,
           title: '',
-          tabBarIcon: () => null, // Hide default icon
+          tabBarIcon: () => null,
           tabBarButton: (props) => <DadarTabButton {...props} />,
         }}
       /> 
@@ -97,6 +99,7 @@ export default function TabLayout() {
         options={{
           title: 'Places',
           tabBarIcon: ({ color }) => <TabBarIcon name="building" color={color} />,
+          headerRight: () => <AppHeaderRight />,
         }}
       />
       <Tabs.Screen
@@ -104,6 +107,7 @@ export default function TabLayout() {
         options={{
           title: 'Event',
           tabBarIcon: ({ color }) => <TabBarIcon name="calendar" color={color} />,
+          headerRight: () => <AppHeaderRight />,
         }}
       />
 

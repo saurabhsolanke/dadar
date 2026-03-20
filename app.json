@@ -9,16 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/yellow-bglogo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFD700"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.dadar",
+      "bundleIdentifier": "com.saurabhsolanke.dadar",
       "appleTeamId": "UR82624726"
     },
     "android": {
+      "package": "com.saurabhsolanke.dadar",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"

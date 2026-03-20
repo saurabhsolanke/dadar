@@ -1,18 +1,31 @@
+import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import { logScreenView } from '@/src/services/logging';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../src/config/firebase';
 
 import { useTheme } from '@/src/context/ThemeContext';
 
 export default function BlogDetailScreen() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const [item, setItem] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const { theme } = useTheme();
     const isDark = theme === 'dark';
+
+    const dynamicStyles = {
+        container: { backgroundColor: isDark ? '#000' : '#fff' },
+        text: { color: isDark ? '#fff' : '#000' },
+        subText: { color: isDark ? '#ccc' : '#444' },
+        author: { color: isDark ? '#888' : '#888' },
+        relatedContainer: { borderTopColor: isDark ? '#333' : '#f0f0f0' },
+        relatedCard: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
+        headerIcon: { color: isDark ? '#fff' : '#000' },
+    };
 
     useEffect(() => {
         logScreenView(`Blog_Detail_${id}`);
@@ -39,21 +52,10 @@ export default function BlogDetailScreen() {
         fetchDetail();
     }, [id]);
 
-    const dynamicStyles = {
-        container: { backgroundColor: isDark ? '#000' : '#fff' },
-        text: { color: isDark ? '#fff' : '#000' },
-        subText: { color: isDark ? '#ccc' : '#444' },
-        author: { color: isDark ? '#888' : '#888' },
-        relatedContainer: { borderTopColor: isDark ? '#333' : '#f0f0f0' },
-        relatedCard: { backgroundColor: isDark ? '#1c1c1e' : '#f9f9f9' },
-        headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
-        headerTint: isDark ? '#fff' : '#000',
-    };
-
     if (loading) {
         return (
             <View style={[styles.center, dynamicStyles.container]}>
-                <ActivityIndicator size="large" color="#FFD700" />
+                <ActivityIndicator size="large" color={isDark ? "#FFD700" : "#000"} />
             </View>
         );
     }
@@ -68,17 +70,30 @@ export default function BlogDetailScreen() {
 
     return (
         <ScrollView style={[styles.container, dynamicStyles.container]}>
-            <Stack.Screen options={{ 
-                title: 'Blog Details',
-                headerStyle: dynamicStyles.headerStyle,
-                headerTintColor: dynamicStyles.headerTint,
-            }} />
+            <Stack.Screen
+                options={{
+                    headerTitle: 'Blog',
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+                            <FontAwesome name="arrow-left" size={20} color={dynamicStyles.headerIcon.color} />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => <AppHeaderRight />,
+                    headerTitleStyle: {
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: isDark ? '#fff' : '#000',
+                    },
+                }}
+            />
 
             <Text style={[styles.headerTitle, dynamicStyles.text]}>{item.title}</Text>
 
             {(() => {
-                const imageUrl = Array.isArray(item.image) 
-                    ? item.image[0] 
+                const imageUrl = Array.isArray(item.image)
+                    ? item.image[0]
                     : item.image || (item.images && item.images.length > 0 ? item.images[0] : null);
 
                 if (imageUrl) {
@@ -96,7 +111,6 @@ export default function BlogDetailScreen() {
 
             <View style={[styles.relatedContainer, dynamicStyles.relatedContainer]}>
                 <Text style={[styles.relatedTitle, dynamicStyles.text]}>Related Blogs</Text>
-                {/* Placeholders for related blogs */}
                 <View style={[styles.relatedCard, dynamicStyles.relatedCard]} />
                 <View style={[styles.relatedCard, dynamicStyles.relatedCard]} />
             </View>
@@ -118,6 +132,7 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         padding: 16,
+        lineHeight: 30,
         color: '#000',
     },
     image: {
@@ -131,12 +146,12 @@ const styles = StyleSheet.create({
     author: {
         fontSize: 14,
         color: '#888',
-        marginBottom: 10,
+        marginBottom: 12,
         fontWeight: '500',
     },
     content: {
         fontSize: 16,
-        lineHeight: 24,
+        lineHeight: 26,
         color: '#444',
         marginBottom: 16,
     },
@@ -148,12 +163,12 @@ const styles = StyleSheet.create({
     relatedTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 12,
     },
     relatedCard: {
-        height: 100,
+        height: 80,
         backgroundColor: '#f9f9f9',
         marginBottom: 10,
-        borderRadius: 8,
-    }
+        borderRadius: 12,
+    },
 });

@@ -1,14 +1,17 @@
+import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import { logScreenView } from '@/src/services/logging';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { db } from '../../src/config/firebase';
 
 import { useTheme } from '@/src/context/ThemeContext';
 
 export default function ExperienceDetailScreen() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
     const [item, setItem] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const { theme } = useTheme();
@@ -19,6 +22,7 @@ export default function ExperienceDetailScreen() {
         text: { color: isDark ? '#fff' : '#000' },
         subText: { color: isDark ? '#ccc' : '#444' },
         metaText: { color: isDark ? '#888' : '#888' },
+        headerIcon: { color: isDark ? '#fff' : '#000' },
     };
 
     useEffect(() => {
@@ -64,7 +68,24 @@ export default function ExperienceDetailScreen() {
 
     return (
         <ScrollView style={[styles.container, dynamicStyles.container]}>
-            <Stack.Screen options={{ title: 'Experience', headerStyle: { backgroundColor: isDark ? '#000' : '#fff' }, headerTintColor: isDark ? '#fff' : '#000' }} />
+            <Stack.Screen
+                options={{
+                    headerTitle: 'Experience',
+                    headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
+                    headerTintColor: isDark ? '#fff' : '#000',
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+                            <FontAwesome name="arrow-left" size={20} color={dynamicStyles.headerIcon.color} />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => <AppHeaderRight />,
+                    headerTitleStyle: {
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: isDark ? '#fff' : '#000',
+                    },
+                }}
+            />
 
             <Text style={[styles.headerTitle, dynamicStyles.text]}>{item.title}</Text>
 

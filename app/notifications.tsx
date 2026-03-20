@@ -1,13 +1,16 @@
+import { AppHeaderRight } from '@/src/components/AppHeaderRight';
 import { useTheme } from '@/src/context/ThemeContext';
 import { Notification, subscribeToNotifications } from '@/src/services/notifications';
-import { Stack } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function NotificationsScreen() {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
+    const router = useRouter();
     
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
@@ -46,9 +49,20 @@ export default function NotificationsScreen() {
         <View style={[styles.container, dynamicStyles.container]}>
             <Stack.Screen
                 options={{
+                    headerTitle: 'Notifications',
                     headerStyle: { backgroundColor: isDark ? '#000' : '#fff' },
                     headerTintColor: isDark ? '#fff' : '#000',
-                    title: 'Notifications',
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => router.back()} style={{ marginLeft: 10 }}>
+                            <FontAwesome name="arrow-left" size={20} color={isDark ? '#fff' : '#000'} />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => <AppHeaderRight />,
+                    headerTitleStyle: {
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: isDark ? '#fff' : '#000',
+                    },
                 }}
             />
             {notifications.length === 0 ? (
