@@ -198,16 +198,6 @@ export default function ProfileScreen() {
                              value={isDark}
                          />
                      </View>
-
-                    {/* Developer Options - Seed Data */}
-                    <View style={[styles.divider, { backgroundColor: isDark ? '#333' : '#eee', marginVertical: 10 }]} />
-                    <TouchableOpacity style={styles.menuItem} onPress={handleSeedData}>
-                        <View style={styles.menuItemLeft}>
-                            <Ionicons name="layers-outline" size={24} color={isDark ? "#FFD700" : "#B8860B"} />
-                            <Text style={[styles.menuItemLabel, { color: isDark ? "#FFD700" : "#B8860B", fontWeight: '600' }]}>Seed Showcase Data</Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} color={isDark ? "#FFD700" : "#B8860B"} />
-                    </TouchableOpacity>
                 </View>
             </View>
 
