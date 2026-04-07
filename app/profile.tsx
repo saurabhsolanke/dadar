@@ -5,6 +5,7 @@ import { ActivityIndicator, Image, ScrollView, StyleSheet, Switch, Text, Touchab
 import Toast from 'react-native-toast-message';
 import { useAuth } from '../src/hooks/useAuth';
 import { logout } from '../src/services/auth';
+import { seedDatabase } from '../src/services/seedData';
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -32,6 +33,33 @@ export default function ProfileScreen() {
             Toast.show({
                 type: 'error',
                 text1: 'Logout failed',
+                text2: error.message || 'Please try again',
+            });
+        }
+    };
+
+    const handleSeedData = async () => {
+        try {
+            Toast.show({
+                type: 'info',
+                text1: 'Seeding database...',
+                text2: 'This may take a few seconds',
+            });
+            const success = await seedDatabase();
+            if (success) {
+                Toast.show({
+                    type: 'success',
+                    text1: 'Database seeded!',
+                    text2: 'Sample data has been added successfully.',
+                });
+            } else {
+                throw new Error('Seeding failed');
+            }
+        } catch (error: any) {
+            console.error("Seeding failed", error);
+            Toast.show({
+                type: 'error',
+                text1: 'Seeding failed',
                 text2: error.message || 'Please try again',
             });
         }
@@ -170,6 +198,16 @@ export default function ProfileScreen() {
                              value={isDark}
                          />
                      </View>
+
+                    {/* Developer Options - Seed Data */}
+                    <View style={[styles.divider, { backgroundColor: isDark ? '#333' : '#eee', marginVertical: 10 }]} />
+                    <TouchableOpacity style={styles.menuItem} onPress={handleSeedData}>
+                        <View style={styles.menuItemLeft}>
+                            <Ionicons name="layers-outline" size={24} color={isDark ? "#FFD700" : "#B8860B"} />
+                            <Text style={[styles.menuItemLabel, { color: isDark ? "#FFD700" : "#B8860B", fontWeight: '600' }]}>Seed Showcase Data</Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={20} color={isDark ? "#FFD700" : "#B8860B"} />
+                    </TouchableOpacity>
                 </View>
             </View>
 

@@ -2,6 +2,7 @@ import BannerCarousel from '@/src/components/BannerCarousel';
 import HistoryCard from '@/src/components/HistoryCard';
 import HotelCard from '@/src/components/HotelCard';
 import NewsCard from '@/src/components/NewsCard';
+import OrganizeEventCard from '@/src/components/OrganizeEventCard';
 import SkeletonLoader from '@/src/components/SkeletonLoader';
 import { logScreenView } from '@/src/services/logging';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -64,9 +65,7 @@ export default function HomeScreen() {
   const [shops, setShops] = useState<ShopItem[]>([]);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeEventIndex, setActiveEventIndex] = useState(0);
   const viewportWidth = Dimensions.get('window').width;
 
   const dynamicStyles = {
@@ -83,12 +82,6 @@ export default function HomeScreen() {
     paginationDotInactive: { backgroundColor: isDark ? '#444' : '#ccc' },
   };
 
-  const handleEventScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const slideSize = event.nativeEvent.layoutMeasurement.width;
-    const index = event.nativeEvent.contentOffset.x / slideSize;
-    const roundIndex = Math.round(index);
-    setActiveEventIndex(roundIndex);
-  };
 
   useEffect(() => {
     logScreenView('Home_Screen');
@@ -158,22 +151,7 @@ export default function HomeScreen() {
         });
         setNews(newsList);
 
-        // Fetch Events
-        const eventsQuery = query(collection(db, 'events'), limit(5));
-        const eventsSnapshot = await getDocs(eventsQuery);
-        const eventsList = eventsSnapshot.docs.map(doc => {
-          const data = doc.data();
-          const imageUrl = data.image || (data.images && data.images.length > 0 ? data.images[0] : null) || '  ';
-          return {
-            id: doc.id,
-            title: data.title || 'Untitled',
-            description: data.description || '',
-            location: data.location || 'Unknown',
-            organizer: data.organizer || 'Unknown',
-            image: { uri: imageUrl }
-          };
-        });
-        setEvents(eventsList);
+        // All data fetched
 
       } catch (error) {
         console.error("Error fetching home data:", error);
@@ -301,43 +279,7 @@ export default function HomeScreen() {
         )}
       </ScrollView>
 
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, dynamicStyles.sectionTitle]}>Organise Your Event</Text>
-        <TouchableOpacity onPress={() => router.push('/event')}>
-            <Text style={styles.seeAllText}>See All</Text>
-        </TouchableOpacity>
-      </View>
-      <View>
-         {loading ? (
-             <View style={{ flexDirection: 'row', gap: 15, paddingLeft: 20 }}>
-                {[1, 2, 3].map((i) => (
-                    <View key={i} style={{ width: 200, marginRight: 15 }}>
-                        <SkeletonLoader height={170} borderRadius={12} style={{ marginBottom: 8 }} />
-                        <SkeletonLoader height={20} width="80%" borderRadius={4} style={{ marginBottom: 4 }} />
-                        <SkeletonLoader height={16} width="60%" borderRadius={4} />
-                    </View>
-                ))}
-             </View>
-         ) : (
-            <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.listContainer}
-            >
-                {events.map((event, index) => (
-                    <EventCard
-                    key={index}
-                    title={event.title}
-                    description={event.description}
-                    image={event.image}
-                    width={200}
-                    height={250}
-                    onPress={() => navigateToEvent(event.id, event.title)}
-                    />
-                ))}
-            </ScrollView>
-         )}
-      </View>
+      <OrganizeEventCard onPress={(id, title) => navigateToEvent(id, title)} />
 
       {/* Historical Places Section */}
       <View style={styles.sectionHeader}>

@@ -1,6 +1,7 @@
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useTheme } from '@/src/context/ThemeContext';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, Image, Linking, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BannerItem, subscribeToBanners } from '../services/banners';
 
 const { width } = Dimensions.get('window');
@@ -63,15 +64,23 @@ export default function BannerCarousel() {
                         />
                         <View style={styles.bannerOverlay}>
                             <Text style={styles.bannerTitle}>{item.title}</Text>
-                            <Text style={styles.bannerSubtitle}>{item.subtitle}</Text>
-                            <Text style={styles.bannerLocation}>{item.location}</Text>
-                            <View style={styles.registerButton}>
-                                <Text style={styles.registerText}>Register Now</Text>
+                            {item.subtitle ? <Text style={styles.bannerSubtitle}>{item.subtitle}</Text> : null}
+                            <View style={styles.locationContainer}>
+                                <FontAwesome name="map-marker" size={12} color="#fff" style={{ marginRight: 4 }} />
+                                <Text style={styles.bannerLocation}>{item.location}</Text>
                             </View>
+                            <TouchableOpacity 
+                                style={styles.registerButton}
+                                onPress={() => item.link ? Linking.openURL(item.link) : null}
+                            >
+                                <Text style={styles.registerText}>Register Now</Text>
+                            </TouchableOpacity>
                         </View>
-                        <View style={[styles.dateTag, dynamicStyles.dateTag]}>
-                            <Text style={[styles.dateText, dynamicStyles.dateText]}>{item.date}</Text>
-                        </View>
+                        {item.date ? (
+                            <View style={[styles.dateTag, dynamicStyles.dateTag]}>
+                                <Text style={[styles.dateText, dynamicStyles.dateText]}>{item.date}</Text>
+                            </View>
+                        ) : null}
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -134,10 +143,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 8,
     },
+    locationContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
     bannerLocation: {
         color: '#fff',
         fontSize: 12,
-        marginBottom: 12,
     },
     registerButton: {
         backgroundColor: '#FFD700',
